@@ -9,6 +9,7 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "bento/ubuntu-20.04"
+  #config.vm.box = "ubuntu/focal64"
   config.vm.hostname = "ubuntu"
 
   # accessing "localhost:8080" will access port 80 on the guest machine.
@@ -68,20 +69,31 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
   end
 
+
+
+
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
+    echo "****************************************"
+    echo " INSTALLING PYTHON 3 ENVIRONMENT..."
+    echo "****************************************"
+    #install Python 3 and dev tools
     apt-get update
     apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
     apt-get -y autoremove
 
+    
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
-    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
-  SHELL
+    # Install app dependencies in virtual environment as vagrant user
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && pip install -U pip && pip install wheel'
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt' 
 
+  SHELL
+  
   ######################################################################
   # Add PostgreSQL docker container
   ######################################################################
