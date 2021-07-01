@@ -64,7 +64,7 @@ class TestShopcartModel(unittest.TestCase):
         """ Test something """
         self.assertTrue(True)
     
-    def test_create_an_item_in_the_shopcart(self):
+    def test_create_an_item_in_a_shopcart(self):
         """Create a item and assert that it exists"""
         #shopcart = Shopcart(name="fido", category="dog", available=True, gender=Gender.Male)
         time_freeze = datetime.utcnow
@@ -75,4 +75,16 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcart.quantity, 1)
         self.assertEqual(shopcart.price, 5.99)
         self.assertEqual(shopcart.time_added, time_freeze)
-        #self.assertTrue(True)
+    
+    def test_update_an_item_in_a_shopcart(self):
+        """Create a pet and add it to the database"""
+        pets = Pet.all()
+        self.assertEqual(pets, [])
+        pet = Pet(name="fido", category="dog", available=True, gender=Gender.Male)
+        self.assertTrue(pet != None)
+        self.assertEqual(pet.id, None)
+        pet.create()
+        # Asert that it was assigned an id and shows up in the database
+        self.assertEqual(pet.id, 1)
+        pets = Pet.all()
+        self.assertEqual(len(pets), 1)
