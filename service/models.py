@@ -26,6 +26,9 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+def init_db(app):
+    """Initialies the SQLAlchemy app"""
+    Shopcart.init_db(app)
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -41,8 +44,8 @@ class Shopcart(db.Model):
     app = None
 
     # Table Schema
-    shopcart_id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, primary_key=True)
+    shopcart_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    product_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     quantity = db.Column(db.Integer, nullable=False,default=0)
     price = db.Column(db.Float, nullable=False, default=0.00)
     time_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -54,7 +57,7 @@ class Shopcart(db.Model):
         """
         Creates a Shopcart item in the database
         """
-        logger.info("Creating %d %d", self.shopcart_id, self.product_id)
+        logger.info("Creating shopcart item %d %d", self.shopcart_id, self.product_id)
         # self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
