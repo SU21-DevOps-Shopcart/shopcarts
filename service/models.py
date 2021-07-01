@@ -52,16 +52,16 @@ class Shopcart(db.Model):
 
     def create(self):
         """
-        Creates a Shopcart item to the database
+        Creates a Shopcart item in the database
         """
         logger.info("Creating %d %d", self.shopcart_id, self.product_id)
         # self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
+    def update(self):
         """
-        Updates a Shopcart item to the database
+        Updates a Shopcart item in the database
         """
         logger.info("Saving %d %d", self.shopcart_id, self.product_id)
         db.session.commit()
@@ -125,13 +125,13 @@ class Shopcart(db.Model):
     def find(cls, shopcart_id, product_id):
         """ Finds a Shopcart item by it's shopcart_id and product_id """
         logger.info("Processing lookup for shopcart_id %d and product_id %d ...", shopcart_id, product_id)
-        return cls.query.get(shopcart_id, product_id)
+        return cls.query.get((shopcart_id, product_id))
 
     @classmethod
     def find_or_404(cls, shopcart_id, product_id):
         """ Find a Shopcart item by it's shopcart_id and product_id """
         logger.info("Processing lookup or 404 for shopcart_id %d and product_id %d ...", shopcart_id, product_id)
-        return cls.query.get_or_404(shopcart_id, product_id)
+        return cls.query.get_or_404((shopcart_id, product_id))
 
     # @classmethod
     # def find_by_name(cls, name):
