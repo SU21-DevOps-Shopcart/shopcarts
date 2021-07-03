@@ -37,10 +37,58 @@ def index():
         jsonify(
             name="Shopcarts REST API Service",
             version="1.0",
-            #paths=url_for("list_shopcarts", _external=True),
+            #paths=url_for("list_items", _external=True)
         ),
         status.HTTP_200_OK,
     )
+
+######################################################################
+# LIST ALL ITEMS
+######################################################################
+@app.route("/items", methods=["GET"])
+def list_items():
+    """ Return all of the items """
+    app.logger.info("Request for item list")
+    
+    return make_response(
+        "Reminder: return all the items",
+        status.HTTP_200_OK
+    )
+
+######################################################################
+# UPDATE AN EXISTING ITEM
+######################################################################
+@app.route("/items/<int:item_id>", methods=["PUT"])
+def update_item(item_id):
+    """
+    Update a item
+
+    This endpoint will update a item based the body that is posted
+    """
+    app.logger.info("Request to update item with id: %s", item_id)
+    return(
+        "Reminder: update an existing item with id",
+        status.HTTP_200_OK
+    )
+
+######################################################################
+# DELETE A ITEM
+######################################################################
+
+@app.route("/items/<int:item_id>", methods=["DELETE"])
+def delete_item(item_id):
+    """
+    Delete a Item
+
+    This endpoint will delete a Item based the id specified in the path
+    """
+    app.logger.info("Request to delete item with id: %s", item_id)
+
+    return(
+        "Reminder: delete an existing item with id",
+        status.HTTP_200_OK
+    )
+
 
 
 ######################################################################

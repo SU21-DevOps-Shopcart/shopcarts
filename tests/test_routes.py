@@ -21,6 +21,10 @@ DATABASE_URI = os.getenv(
 BASE_URL = "/shopcarts"
 CONTENT_TYPE_JSON = "application/json"
 
+DATABASE_URI = os.getenv(
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
+)
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -37,6 +41,7 @@ class TestYourResourceServer(TestCase):
         app.logger.setLevel(logging.CRITICAL)
         Shopcart.init_db(app)
 
+
     @classmethod
     def tearDownClass(cls):
         """Run once after all tests"""
@@ -48,10 +53,11 @@ class TestYourResourceServer(TestCase):
         db.create_all()  # create new tables
         self.app = app.test_client()
 
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-
+        
     def _create_item(self):
         time_freeze = datetime.utcnow()
         data = {
@@ -72,13 +78,14 @@ class TestYourResourceServer(TestCase):
         return shopcart
 
 
+
     def test_index(self):
-        """Test the Home Page"""
+       """Test the Home Page"""
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcarts REST API Service")
-
+        
     def test_get_item(self):
         """Get a single Shopcart Item"""
         # get a shopcart item
@@ -134,3 +141,21 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_item["quantity"], shopcart.quantity, "quantity does not match")
         self.assertEqual(new_item["price"], shopcart.price, "price does not match")
         #self.assertEqual(new_item["time_added"], shopcart.time_added, "time_added does not match")
+
+    def test_list_items(self):
+        """ Test list items """
+        resp = self.app.get("/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_update_an_item(self):
+        """ Test update an existings items """
+        resp = self.app.put("/items/{}".format(1))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+
+    def test_delete_an_item(self):
+        """ Test list items """
+        resp = self.app.delete("/items/{}".format(1))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    
+
