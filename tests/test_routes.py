@@ -21,10 +21,6 @@ DATABASE_URI = os.getenv(
 BASE_URL = "/shopcarts"
 CONTENT_TYPE_JSON = "application/json"
 
-DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
-)
-
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -40,7 +36,6 @@ class TestYourResourceServer(TestCase):
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         Shopcart.init_db(app)
-
 
     @classmethod
     def tearDownClass(cls):
