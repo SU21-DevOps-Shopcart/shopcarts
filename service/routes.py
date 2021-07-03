@@ -85,7 +85,6 @@ def create_shopcart(shopcart_id):
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
-    #return make_response(jsonify("received"), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
