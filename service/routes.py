@@ -13,9 +13,10 @@ DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
 import os
 import sys
 import logging
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import Flask, json, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from . import status # HTTP Status Codes
+from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -43,30 +44,48 @@ def index():
 
 
 ######################################################################
+# RETRIEVE A SHOPCART ITEM
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["GET"])
+def get_shopcarts(shopcart_id, product_id):
+    """
+    Retrieve a single Shopcart item
+    This endpoint will return a Shopcart item based on it's shopcart_id and product_id
+    """
+    app.logger.info("Request for Shopcart item with shopcart_id: %d and product_id: %d", shopcart_id, product_id)
+    shopcart = Shopcart.find(shopcart_id, product_id)
+    if not shopcart:
+        raise NotFound("Shopcart with shopcart_id '{}' and product_id '{}' was not found.".format(shopcart_id, product_id))
+
+    app.logger.info("Returning Shopcart item with shopcart_id: %d and product_id: %d", shopcart.shopcart_id, shopcart.product_id)
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 #  ADD A NEW SHOPCART ITEM
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["POST"]) #"/shopcarts/<int:shopcart_id>/items/<int:product_id>"
-def create_shopcart(shopcart_id, product_id):
+@app.route("/shopcarts/<int:shopcart_id>", methods=["POST"])
+def create_shopcart(shopcart_id):
     """
     Creates a new Shopcart item
     This endpoint will create a Shopcart item based on the data in the body that is posted
     """
     app.logger.info("Request to create a Shopcart item")
-    if request.is_json:
-        app.logger.info("got json")
-    req = request.get_json()
-    app.logger.info(req)
     check_content_type("application/json")
-    #shopcart = Shopcart()
-    #shopcart.deserialize(request.get_json())
-    #shopcart.create()
-    #message = shopcart.serialize()
-    #location_url = url_for("get_shopcarts", shopcarts_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+    shopcart = Shopcart()
+    data = request.get_json()
+    data["shopcart_id"] = shopcart_id
+    print(data)
+    shopcart.deserialize(data)
+    shopcart.create()
+    message = shopcart.serialize()
+    location_url = url_for("get_shopcarts", shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
 
-    #app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created")
-    #return make_response(
-    #    jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    #)
+    app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created")
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+    #return make_response(jsonify("received"), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
