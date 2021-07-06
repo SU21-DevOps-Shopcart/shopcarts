@@ -135,16 +135,15 @@ def create_item(shopcart_id):
             jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
         )
     else:
-        print(item.quantity)
-        shopcart.quantity = str(int(item.quantity) + 1) 
-        shopcart.update()
-        message = shopcart.serialize()
+        # message = shopcart.serialize()
+        message = "item already exists"
         location_url = url_for("get_item", shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
 
-        app.logger.info("Shopcart item already created")
+        app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d already created", shopcart.shopcart_id, shopcart.product_id)
         return make_response(
-            jsonify(message), status.HTTP_200_OK, {"Location": location_url}
+            jsonify(message), status.HTTP_409_CONFLICT, {"Location": location_url}
         )
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

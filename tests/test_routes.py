@@ -80,7 +80,7 @@ class TestYourResourceServer(TestCase):
        self.assertEqual(data["name"], "Shopcarts REST API Service")
         
     def test_get_item(self):
-        """Get a single Shopcart Item"""
+        """Test Get a single Shopcart Item"""
         # get a shopcart item
         shopcart = self._create_item()
         print(shopcart)
@@ -92,13 +92,12 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(data["product_id"], shopcart.product_id)
 
     def test_get_item_not_found(self):
-        """Get a Shopcart item thats not found"""
+        """Test Get a Shopcart item thats not found"""
         resp = self.app.get("/shopcarts/0/items/0")
-        print(resp.status_code)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_item(self):
-        """Create a new Shopcart item"""
+        """Test Create a new Shopcart item"""
         time_freeze = datetime.utcnow()
         data = {
             "shopcart_id": 1234,
@@ -116,8 +115,6 @@ class TestYourResourceServer(TestCase):
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
-        #print(time_freeze.strftime("%A, %d %m %y"))
-        #print(time_freeze.ctime())
         # Check the data is correct
         new_item = resp.get_json()
         self.assertEqual(new_item["shopcart_id"], shopcart.shopcart_id, "shopcart_id do not match")
@@ -134,6 +131,28 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_item["quantity"], shopcart.quantity, "quantity does not match")
         self.assertEqual(new_item["price"], shopcart.price, "price does not match")
         #self.assertEqual(new_item["time_added"], shopcart.time_added, "time_added does not match")
+
+    def test_create_duplicate_item(self):
+        """Test Create a Shopcart item that already exists"""
+        time_freeze = datetime.utcnow()
+        data = {
+            "shopcart_id": 1234,
+            "product_id": 5678,
+            "quantity": 1,
+            "price": 0.01,
+            "time_added": time_freeze,
+        }
+        shopcart = Shopcart()
+        shopcart.deserialize(data)
+        resp = self.app.post(
+            BASE_URL + "/{}".format(shopcart.shopcart_id), json=shopcart.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # add the item again for an error
+        resp = self.app.post(
+            BASE_URL + "/{}".format(shopcart.shopcart_id), json=shopcart.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_list_items(self):
         """ Test list items """
