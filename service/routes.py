@@ -87,7 +87,8 @@ def list_one_shopcart_item(shopcart_id):
     """ Query an item from a customer's Shopcart """
     app.logger.info("Request an item from the Shopcart")
 
-    product_id = int(request.args.get("product-id"))
+    product_param = int(request.args.get("product-id"))
+    product_id = int(request.args.get("product-id")) if product_param else None
     if product_id:
         shopcarts = Shopcart.find(shopcart_id, product_id)
     else:
