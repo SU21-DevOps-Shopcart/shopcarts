@@ -78,6 +78,37 @@ def list_items():
     )
 
 ######################################################################
+# QUERY AN ITEM FROM A CUSTOMER'S SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def list_one_shopcart_item(shopcart_id):
+    """ Query an item from a customer's Shopcart """
+    app.logger.info("Request an item from the Shopcart")
+
+    product_id = int(request.args.get("product-id"))
+    if product_id:
+        shopcarts = Shopcart.find(shopcart_id, product_id)
+    else:
+        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+
+    if not shopcarts:
+            app.logger.info("Returning 0 items")
+            message = "no items found"
+            return make_response(
+                jsonify(message),
+                status.HTTP_200_OK
+            )
+    if shopcart_id and product_id:
+        results = [shopcarts.serialize()]
+    else:
+        results = [shopcart.serialize() for shopcart in shopcarts]
+    app.logger.info("Returning %d items", len(results))
+    return make_response(
+        jsonify(results),
+        status.HTTP_200_OK
+    )
+
+######################################################################
 # UPDATE AN EXISTING ITEM
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["PUT"])
