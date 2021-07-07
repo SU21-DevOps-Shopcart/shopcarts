@@ -166,8 +166,17 @@ class TestYourResourceServer(TestCase):
 
 
     def test_delete_an_item(self):
-        """ Test list items """
-        resp = self.app.delete("/items/{}".format(1))
+        """ Test delete a item """
+        #add a item
+        shopcart = self._create_item()
+        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        #delete the item
+        resp = self.app.delete("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        # make sure item not in database
+        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     
 

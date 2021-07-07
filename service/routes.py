@@ -75,19 +75,21 @@ def update_item(item_id):
 # DELETE A ITEM
 ######################################################################
 
-@app.route("/items/<int:item_id>", methods=["DELETE"])
-def delete_item(item_id):
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["DELETE"])
+def delete_item(shopcart_id,product_id):
     """
     Delete a Item
 
     This endpoint will delete a Item based the id specified in the path
     """
-    app.logger.info("Request to delete item with id: %s", item_id)
+    app.logger.info("Request to delete item in shopcart: %s with id: %s", shopcart_id,product_id)
 
-    return(
-        "Reminder: delete an existing item with id",
-        status.HTTP_200_OK
-    )
+    shopcart = Shopcart.find(shopcart_id, product_id)
+
+    if shopcart:
+        shopcart.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 
 
