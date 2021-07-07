@@ -58,18 +58,34 @@ def list_items():
 ######################################################################
 # UPDATE AN EXISTING ITEM
 ######################################################################
-@app.route("/items/<int:item_id>", methods=["PUT"])
-def update_item(item_id):
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["PUT"])
+def update_item(shopcart_id,product_id):
     """
     Update a item
 
+    when add item existing in database, will increase its quantity
+    and changed price when was added
+
     This endpoint will update a item based the body that is posted
     """
-    app.logger.info("Request to update item with id: %s", item_id)
-    return(
-        "Reminder: update an existing item with id",
-        status.HTTP_200_OK
-    )
+    app.logger.info("Request to update item in shopcart: %s with id: %s",shopcart_id, product_id)
+    check_content_type("application/json")
+
+    shopcart = Shopcart.find(shopcart_id, product_id)
+
+    if not shopcart:
+        raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
+    
+    else:
+        shopcart_dict_database = shopcart.serialize()
+        quantity = shopcart_dict_database['quantity']
+        quantity = quantity + 1
+        request_dict = request.get_json()
+        request_dict['quantity'] = str(quantity)
+        request_dict['shopcart_id'] = shopcart_id
+        shopcart.deserialize(request_dict)
+        shopcart.update()
+        return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE A ITEM
@@ -88,7 +104,7 @@ def delete_item(shopcart_id,product_id):
 
     if shopcart:
         shopcart.delete()
-    return make_response("", status.HTTP_204_NO_CONTENT)
+    return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
 
 
 
