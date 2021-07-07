@@ -161,6 +161,32 @@ def delete_item(shopcart_id,product_id):
 
 
 
+######################################################################
+# CLEAR SHOPCART
+######################################################################
+
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def clear_shopcart(shopcart_id):
+    """
+    Delete All items in specific cart
+
+    This endpoint will delete a Item based the id specified in the path
+    """
+    app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
+
+    shopcart = Shopcart.find_by_shopcart_id(shopcart_id)
+
+    results = [item.serialize() for item in shopcart]
+
+    if results:
+        for i in results:
+            print(i)
+            shopcart = Shopcart.find(shopcart_id, i['product_id'])
+            shopcart.delete()
+    return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
+
+
+
 
 ######################################################################
 # RETRIEVE A SHOPCART ITEM
