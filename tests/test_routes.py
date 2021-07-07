@@ -72,6 +72,25 @@ class TestYourResourceServer(TestCase):
         )
         return shopcart
 
+    def _create_item_with_id(self, id):
+        time_freeze = datetime.utcnow()
+        data = {
+            "shopcart_id": 1234,
+            "product_id": id,
+            "quantity": 1,
+            "price": 0.01,
+            "time_added": time_freeze,
+        }
+        shopcart = Shopcart()
+        shopcart.deserialize(data)
+        resp = self.app.post(
+            BASE_URL + "/{}".format(shopcart.shopcart_id), json=shopcart.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(
+            resp.status_code, status.HTTP_201_CREATED, "Could not create Shopcart item"
+        )
+        return shopcart
+
     def test_index(self):
        """Test the Home Page"""
        resp = self.app.get("/")
@@ -83,7 +102,6 @@ class TestYourResourceServer(TestCase):
         """Test Get a single Shopcart Item"""
         # get a shopcart item
         shopcart = self._create_item()
-        print(shopcart)
         resp = self.app.get(
             "/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id), content_type=CONTENT_TYPE_JSON
         )
@@ -156,8 +174,18 @@ class TestYourResourceServer(TestCase):
 
     def test_list_items(self):
         """ Test list items """
-        resp = self.app.get("/items")
+        item1 = self._create_item_with_id(100)
+        item2 = self._create_item_with_id(101)
+        item3 = self._create_item_with_id(102)
+        resp = self.app.get("/shopcarts?shopcart_id=123")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        items = resp.get_json()
+        self.assertEqual(items[0]["shopcart_id"], 1234)
+        self.assertEqual(items[1]["shopcart_id"], 1234)
+        self.assertEqual(items[2]["shopcart_id"], 1234)
+        self.assertEqual(items[0]["product_id"], 100)
+        self.assertEqual(items[1]["product_id"], 101)
+        self.assertEqual(items[2]["product_id"], 102)
 
     def test_update_an_item(self):
         """ Test update an existings items """

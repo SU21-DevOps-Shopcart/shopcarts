@@ -136,6 +136,16 @@ class Shopcart(db.Model):
         logger.info("Processing lookup or 404 for shopcart_id %d and product_id %d ...", shopcart_id, product_id)
         return cls.query.get_or_404((shopcart_id, product_id))
 
+    @classmethod
+    def find_by_shopcart_id(cls, shopcart_id):
+        """ 
+            Returns all Shopcart items with the given shopcart_id 
+            Args:
+                shopcart_id (int): the shopcart id of the Shopcart you want to match
+        """
+        logger.info("Processing lookup for shopcart_id %d ...", shopcart_id)
+        return cls.query.filter(cls.shopcart_id == shopcart_id)
+
     # @classmethod
     # def find_by_name(cls, name):
     #     """Returns all YourResourceModels with the given name

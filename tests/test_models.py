@@ -224,3 +224,32 @@ class TestShopcartModel(unittest.TestCase):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Shopcart.find_or_404, 0, 0)
 
+    def test_find_by_shopcart_id(self):
+        """Test Find items by shopcart_id """
+        # make Shopcart item #1
+        time_freeze = datetime.utcnow()
+        shopcart_1 = Shopcart(shopcart_id=1234, product_id=100, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart_1.create()
+        # make Shopcart item #2
+        time_freeze = datetime.utcnow()
+        shopcart_2 = Shopcart(shopcart_id=1234, product_id=101, quantity=1, price=6.00, time_added=time_freeze)
+        shopcart_2.create()
+        # make Shopcart item #3
+        time_freeze = datetime.utcnow()
+        shopcart_3 = Shopcart(shopcart_id=1234, product_id=102, quantity=1, price=9.99, time_added=time_freeze)
+        shopcart_3.create()
+
+        # make sure they got saved
+        self.assertEqual(len(Shopcart.all()), 3)
+        # find the 2nd pet in the list
+        items = Shopcart.find_by_shopcart_id(shopcart_1.shopcart_id)
+        self.assertIsNot(items, None)
+        self.assertEqual(items[0].shopcart_id, shopcart_1.shopcart_id)
+        self.assertEqual(items[1].shopcart_id, shopcart_1.shopcart_id)
+        self.assertEqual(items[2].shopcart_id, shopcart_1.shopcart_id)
+        self.assertEqual(items[0].product_id, shopcart_1.product_id)
+        self.assertEqual(items[1].product_id, shopcart_2.product_id)
+        self.assertEqual(items[2].product_id, shopcart_3.product_id)
+        self.assertEqual(items[0].price, shopcart_1.price)
+        self.assertEqual(items[1].price, shopcart_2.price)
+        self.assertEqual(items[2].price, shopcart_3.price)
