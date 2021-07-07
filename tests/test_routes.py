@@ -187,6 +187,24 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(items[1]["product_id"], item2.product_id)
         self.assertEqual(items[2]["product_id"], item3.product_id)
 
+    def test_list_one_shopcart_item(self):
+        """ Test list one shopcart item """
+        item1 = self._create_item_with_id(100)
+        item2 = self._create_item_with_id(101)
+        item3 = self._create_item_with_id(102)
+        resp = self.app.get("/shopcarts/{}?product-id={}".format(item1.shopcart_id,item1.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item1.product_id)
+        resp = self.app.get("/shopcarts/1234?product-id=101")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item2.product_id)
+        resp = self.app.get("/shopcarts/1234?product-id=102")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item3.product_id)
+
     def test_update_an_item(self):
         """ Test update an existings items """
         #create a item
@@ -240,6 +258,26 @@ class TestYourResourceServer(TestCase):
         # make sure item not in database
         resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_delete_all_items(self):
+        """Test delete all items"""
+        item1 = self._create_item_with_id(100)
+        item2 = self._create_item_with_id(101)
+        item3 = self._create_item_with_id(102)
+
+        resp = self.app.get("/shopcarts?shopcart_id=123")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.get_json()), 3)
+
+        resp = self.app.put("/shopcarts/1234")
+
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        resp = self.app.get("/shopcarts?shopcart_id=123")
+
+        self.assertEqual(resp.get_json(), "no items found")
+
 
     
 
