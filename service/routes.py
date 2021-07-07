@@ -51,8 +51,10 @@ def list_items():
     app.logger.info("Request for Shopcarts list")
     shopcarts = []
     results = []
-    shopcart_id = request.args.get("shopcart-id")
-    product_id = request.args.get("product-id")
+    shopcart_param = request.args.get("shopcart-id")
+    product_param = request.args.get("product-id")
+    shopcart_id = (int(shopcart_param)) if shopcart_param else None
+    product_id = (int(product_param)) if product_param else None
     if shopcart_id and product_id:
         shopcarts = Shopcart.find(shopcart_id, product_id)
     elif shopcart_id:
