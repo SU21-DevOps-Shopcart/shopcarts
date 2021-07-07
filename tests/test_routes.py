@@ -177,15 +177,15 @@ class TestYourResourceServer(TestCase):
         item1 = self._create_item_with_id(100)
         item2 = self._create_item_with_id(101)
         item3 = self._create_item_with_id(102)
-        resp = self.app.get("/shopcarts?shopcart_id=1234")
+        resp = self.app.get("/shopcarts?shopcart-id={}".format(item1.shopcart_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         items = resp.get_json()
-        self.assertEqual(items[0]["shopcart_id"], 1234)
-        self.assertEqual(items[1]["shopcart_id"], 1234)
-        self.assertEqual(items[2]["shopcart_id"], 1234)
-        self.assertEqual(items[0]["product_id"], 100)
-        self.assertEqual(items[1]["product_id"], 101)
-        self.assertEqual(items[2]["product_id"], 102)
+        self.assertEqual(items[0]["shopcart_id"], item1.shopcart_id)
+        self.assertEqual(items[1]["shopcart_id"], item2.shopcart_id)
+        self.assertEqual(items[2]["shopcart_id"], item3.shopcart_id)
+        self.assertEqual(items[0]["product_id"], item1.product_id)
+        self.assertEqual(items[1]["product_id"], item2.product_id)
+        self.assertEqual(items[2]["product_id"], item3.product_id)
 
     def test_list_one_shopcart_item(self):
         """ Test list one shopcart item """
