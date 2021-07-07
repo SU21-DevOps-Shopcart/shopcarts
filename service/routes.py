@@ -45,13 +45,24 @@ def index():
 ######################################################################
 # LIST ALL ITEMS
 ######################################################################
-@app.route("/items", methods=["GET"])
+@app.route("/shopcarts", methods=["GET"])
 def list_items():
-    """ Return all of the items """
-    app.logger.info("Request for item list")
-    
+    """ Return all of the Shopcarts """
+    app.logger.info("Request for Shopcarts list")
+    shopcarts = []
+    shopcart_id = request.args.get("shopcart-id")
+    product_id = request.args.get("product-id")
+    if shopcart_id and product_id:
+        shopcarts = Shopcart.find(shopcart_id, product_id)
+    elif shopcart_id:
+        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+    else:
+        shopcarts = Shopcart.all()
+
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    app.logger.info("Returning %d items", len(results))
     return make_response(
-        "Reminder: return all the items",
+        jsonify(results),
         status.HTTP_200_OK
     )
 
