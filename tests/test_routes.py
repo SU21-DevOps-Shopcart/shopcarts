@@ -161,8 +161,43 @@ class TestYourResourceServer(TestCase):
 
     def test_update_an_item(self):
         """ Test update an existings items """
-        resp = self.app.put("/items/{}".format(1))
+        #create a item
+        shopcart = self._create_item()
+        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        #update item
+        new_item = resp.get_json()
+        logging.debug(new_item)
+        time_freeze = datetime.utcnow()
+        new_item['price'] = "3.9"
+        new_item['time_added'] = time_freeze
+        resp = self.app.put(
+            "/shopcarts/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
+            json=new_item,
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_item = resp.get_json()
+        self.assertEqual(updated_item['price'], 3.9)
+        self.assertEqual(updated_item['quantity'], 2)
+     #   self.assertEqual(updated_item['time_added'], time_freeze)
+
+        resp = self.app.put(
+            "/shopcarts/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
+            json=new_item,
+            content_type="application/json",
+        )
+       # time_freeze = datetime.utcnow()
+        updated_item = resp.get_json()
+        self.assertEqual(updated_item['price'], 3.9)
+        self.assertEqual(updated_item['quantity'], 3)
+      #  self.assertEqual(updated_item['time_added'], time_freeze)
+
+
+
+
 
 
     def test_delete_an_item(self):
