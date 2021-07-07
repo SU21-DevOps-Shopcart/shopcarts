@@ -50,6 +50,7 @@ def list_items():
     """ Return all of the Shopcarts """
     app.logger.info("Request for Shopcarts list")
     shopcarts = []
+    results = []
     shopcart_id = request.args.get("shopcart-id")
     product_id = request.args.get("product-id")
     if shopcart_id and product_id:
@@ -59,7 +60,17 @@ def list_items():
     else:
         shopcarts = Shopcart.all()
 
-    results = [shopcart.serialize() for shopcart in shopcarts]
+    if not shopcarts:
+            app.logger.info("Returning 0 items")
+            message = "no items found"
+            return make_response(
+                jsonify(message),
+                status.HTTP_200_OK
+            )
+    if shopcart_id and product_id:
+        results = [shopcarts.serialize()]
+    else:
+        results = [shopcart.serialize() for shopcart in shopcarts]
     app.logger.info("Returning %d items", len(results))
     return make_response(
         jsonify(results),
