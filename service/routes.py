@@ -42,9 +42,9 @@ def index():
         status.HTTP_200_OK,
     )
 
-######################################################################
+#####################################################################
 # LIST ALL ITEMS
-######################################################################
+#####################################################################
 @app.route("/shopcarts", methods=["GET"])
 def list_items():
     """ Return all of the Shopcarts """
@@ -57,7 +57,9 @@ def list_items():
     product_id = (int(product_param)) if product_param else None
     if shopcart_id and product_id:
         shopcarts = Shopcart.find(shopcart_id, product_id)
-    elif shopcart_id:
+    elif not shopcart_id and product_id:
+        shopcarts = Shopcart.find_by_product_id(product_id)
+    elif shopcart_id and not product_id:
         shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
     else:
         shopcarts = Shopcart.all()
@@ -80,32 +82,24 @@ def list_items():
     )
 
 ######################################################################
-# QUERY AN ITEM FROM A CUSTOMER'S SHOPCART
+# READ ITEMS FROM A CUSTOMER'S SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
-def list_one_shopcart_item(shopcart_id):
-    """ Query an item from a customer's Shopcart """
+def list_items_in_shopcart(shopcart_id):
+    """ Read items from a customer's Shopcart """
     app.logger.info("Request an item from the Shopcart")
 
-    product_param = request.args.get("product-id")
-    product_id = int(request.args.get("product-id")) if product_param else None
-
-    if product_id:
-        shopcarts = Shopcart.find(shopcart_id, product_id)
-    else:
-        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+    shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
 
     if not shopcarts:
             app.logger.info("Returning 0 items")
-            message = "no items found"
+            message = []
             return make_response(
                 jsonify(message),
                 status.HTTP_404_NOT_FOUND
             )
-    if shopcart_id and product_id:
-        results = [shopcarts.serialize()]
-    else:
-        results = [shopcart.serialize() for shopcart in shopcarts]
+
+    results = [items.serialize() for items in shopcarts]
     app.logger.info("Returning %d items", len(results))
     return make_response(
         jsonify(results),
