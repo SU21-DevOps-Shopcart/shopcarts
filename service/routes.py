@@ -87,8 +87,9 @@ def list_one_shopcart_item(shopcart_id):
     """ Query an item from a customer's Shopcart """
     app.logger.info("Request an item from the Shopcart")
 
-    product_param = int(request.args.get("product-id"))
+    product_param = request.args.get("product-id")
     product_id = int(request.args.get("product-id")) if product_param else None
+
     if product_id:
         shopcarts = Shopcart.find(shopcart_id, product_id)
     else:
@@ -99,7 +100,7 @@ def list_one_shopcart_item(shopcart_id):
             message = "no items found"
             return make_response(
                 jsonify(message),
-                status.HTTP_200_OK
+                status.HTTP_404_NOT_FOUND
             )
     if shopcart_id and product_id:
         results = [shopcarts.serialize()]
