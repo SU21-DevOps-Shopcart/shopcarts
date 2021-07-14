@@ -64,7 +64,7 @@ def list_items():
 
     if not shopcarts:
             app.logger.info("Returning 0 items")
-            message = "no items found"
+            message = []
             return make_response(
                 jsonify(message),
                 status.HTTP_200_OK
