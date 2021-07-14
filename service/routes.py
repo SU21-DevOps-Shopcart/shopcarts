@@ -95,7 +95,7 @@ def list_one_shopcart_item(shopcart_id):
     else:
         shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
 
-    if not shopcarts or len(shopcarts) < 1:
+    if not shopcarts:
             app.logger.info("Returning 0 items")
             message = "no items found"
             return make_response(
