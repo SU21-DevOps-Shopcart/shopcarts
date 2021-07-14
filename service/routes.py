@@ -108,7 +108,7 @@ def list_items_in_shopcart(shopcart_id):
 # QUERY ALL SHOPCARTS WITH PRODUCT ID
 ######################################################################
 @app.route("/shopcarts", methods=["GET"])
-def list_shopcarts_with_item():
+def list_shopcarts_with_matching_item():
     """ Query all Shopcarts with product_id """
     app.logger.info("Request shopcarts with product_id")
 
