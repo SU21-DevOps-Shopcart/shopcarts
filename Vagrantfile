@@ -115,4 +115,36 @@ Vagrant.configure(2) do |config|
     docker exec postgres psql -c "create database testdb;" -U postgres
     # Done
   SHELL
+
+  ######################################################################
+  # Setup a Bluemix and Kubernetes environment
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "\n************************************"
+    echo " Installing IBM Cloud CLI..."
+    echo "************************************\n"
+    # Install IBM Cloud CLI as Vagrant user
+    sudo -H -u vagrant sh -c '
+    wget -O bluemix-cli.tar.gz https://clis.cloud.ibm.com/download/bluemix-cli/1.4.0/linux64 && \
+    tar xzf bluemix-cli.tar.gz && \
+    cd Bluemix_CLI/ && \
+    ./install && \
+    cd .. && \
+    rm -fr Bluemix_CLI/ bluemix-cli.tar.gz && \
+    ibmcloud cf install
+    '
+    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
+    echo "\n************************************"
+    echo ""
+    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
+    echo "You can login with the following command:"
+    echo ""
+    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apiKey.json -r us-south"
+    echo "\nibmcloud target -o [your-org] -s dev"
+    echo "\n************************************"
+    # Show the GUI URL for Couch DB
+    echo "\n"
+    echo "CouchDB Admin GUI can be found at:\n"
+    echo "http://127.0.0.1:5984/_utils"
+  SHELL
 end
