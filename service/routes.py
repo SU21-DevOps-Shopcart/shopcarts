@@ -26,6 +26,7 @@ from service.models import Shopcart, DataValidationError
 # Import Flask application
 from . import app
 
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -42,6 +43,7 @@ def index():
         status.HTTP_200_OK,
     )
 
+
 #####################################################################
 # LIST ALL ITEMS
 #####################################################################
@@ -51,8 +53,8 @@ def list_items():
     app.logger.info("Request for Shopcarts list")
     shopcarts = []
     results = []
-    shopcart_param = request.args.get("shopcart-id")
-    product_param = request.args.get("product-id")
+    shopcart_param = request.args.get("shopcart_id")
+    product_param = request.args.get("product_id")
     shopcart_id = (int(shopcart_param)) if shopcart_param else None
     product_id = (int(product_param)) if product_param else None
     if shopcart_id and product_id:
@@ -69,7 +71,7 @@ def list_items():
             message = []
             return make_response(
                 jsonify(message),
-                status.HTTP_200_OK
+                status.HTTP_404_NOT_FOUND
             )
     if shopcart_id and product_id:
         results = [shopcarts.serialize()]
@@ -80,6 +82,7 @@ def list_items():
         jsonify(results),
         status.HTTP_200_OK
     )
+
 
 ######################################################################
 # READ ITEMS FROM A CUSTOMER'S SHOPCART
@@ -105,6 +108,7 @@ def list_items_in_shopcart(shopcart_id):
         jsonify(results),
         status.HTTP_200_OK
     )
+
 
 ######################################################################
 # UPDATE AN EXISTING ITEM
@@ -137,6 +141,7 @@ def update_item(shopcart_id,product_id):
         shopcart.deserialize(request_dict)
         shopcart.update()
         return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 # DELETE A ITEM
