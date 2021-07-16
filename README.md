@@ -2,6 +2,12 @@
 
 Shopcart API.
 
+# nyu-travis-ci
+
+[![Build Status](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts.svg?branch=main)](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts)
+[![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-travis-ci.svg)]()
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Overview
 
 This project emulates Customer's shopcart. Actions like add items to shopcart, duplicate items' quantity, and etc can be achieved.
@@ -328,13 +334,6 @@ cd /vagrant
 
 1. press `ctr` + `c` and input `exit` to get out of virtual machine
 2. input `vagrant halt` to shut down virtual machine
-
-
-# nyu-travis-ci
-
-[![Build Status](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts.svg?branch=main)](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts)
-[![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-travis-ci.svg)]()
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.
