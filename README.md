@@ -8,7 +8,6 @@ Shopcart API.
 [![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-travis-ci.svg)]()
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-
 ## Overview
 
 This project emulates Customer's shopcart. Actions like add items to shopcart, duplicate items' quantity, and etc can be achieved.
