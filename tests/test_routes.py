@@ -277,7 +277,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.get_json()), 3)
 
-        resp = self.app.put("/shopcarts/1234")
+        resp = self.app.delete("/shopcarts/1234")
 
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 

@@ -168,7 +168,7 @@ def delete_item(shopcart_id,product_id):
 # CLEAR SHOPCART
 ######################################################################
 
-@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
 def clear_shopcart(shopcart_id):
     """
     Delete All items in specific cart
