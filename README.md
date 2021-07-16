@@ -329,4 +329,6 @@ cd /vagrant
 1. press `ctr` + `c` and input `exit` to get out of virtual machine
 2. input `vagrant halt` to shut down virtual machine
 
+[![Build Status](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts.svg?branch=main)](https://travis-ci.com/SU21-DevOps-Shopcart/shopcarts)
+
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.
