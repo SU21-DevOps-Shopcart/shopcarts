@@ -61,6 +61,7 @@ class TestYourResourceServer(TestCase):
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
+            "checkout": 0
         }
         shopcart = Shopcart()
         shopcart.deserialize(data)
@@ -80,6 +81,7 @@ class TestYourResourceServer(TestCase):
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
+            "checkout": 0
         }
         shopcart = Shopcart()
         shopcart.deserialize(data)
@@ -123,6 +125,7 @@ class TestYourResourceServer(TestCase):
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
+            "checkout": 0
         }
         shopcart = Shopcart()
         shopcart.deserialize(data)
@@ -139,6 +142,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_item["product_id"], shopcart.product_id, "product_id do not match")
         self.assertEqual(new_item["quantity"], shopcart.quantity, "quantity does not match")
         self.assertEqual(new_item["price"], shopcart.price, "price does not match")
+        self.assertEqual(new_item["checkout"], shopcart.checkout, "checkout does not match")
         #self.assertEqual(new_item["time_added"], shopcart.time_added, "time_added does not match")
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
@@ -148,6 +152,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_item["product_id"], shopcart.product_id, "product_id do not match")
         self.assertEqual(new_item["quantity"], shopcart.quantity, "quantity does not match")
         self.assertEqual(new_item["price"], shopcart.price, "price does not match")
+        self.assertEqual(new_item["checkout"], shopcart.checkout, "checkout does not match")
         #self.assertEqual(new_item["time_added"], shopcart.time_added, "time_added does not match")
 
     def test_create_duplicate_item(self):
@@ -159,6 +164,7 @@ class TestYourResourceServer(TestCase):
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
+            "checkout": 0
         }
         shopcart = Shopcart()
         shopcart.deserialize(data)
@@ -259,6 +265,23 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get("/shopcarts?shopcart_id=123")
 
         self.assertEqual(resp.get_json(), "no items found")
+
+    def test_checkout_item(self):
+        """Test checkout item"""
+        item = self._create_item_with_id(100)
+        resp = self.app.get("/shopcarts/1234/items/100")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        information = resp.get_json()
+        self.assertEqual(information["checkout"], 0)
+
+        print(information)
+
+        resp = self.app.put("/shopcarts/1234/items/100/checkout")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        information = resp.get_json()
+        self.assertEqual(information["checkout"], 1)
+
+        
 
 
     

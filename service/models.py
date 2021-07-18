@@ -15,7 +15,7 @@ product_id (integer) - item id in a customer's cart
 quantity (integer) - number of like items in the cart
 price (decimal) - price at time item is placed in cart
 time_added (timestamp) - latest unix time item was added to the cart
-
+checkout (integer) - checkout status
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
@@ -49,6 +49,8 @@ class Shopcart(db.Model):
     quantity = db.Column(db.Integer, nullable=False,default=0)
     price = db.Column(db.Float, nullable=False, default=0.00)
     time_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # checkout status,  0: not checkout, 1: checkout 
+    checkout = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return "Shopcart shopcart_id=[%d]>" % (self.shopcart_id)
@@ -82,7 +84,8 @@ class Shopcart(db.Model):
             "product_id": self.product_id, 
             "quantity": self.quantity, 
             "price": self.price,
-            "time_added": self.time_added
+            "time_added": self.time_added,
+            "checkout": self.checkout
             }
 
     def deserialize(self, data):
@@ -98,6 +101,7 @@ class Shopcart(db.Model):
             self.quantity = data["quantity"]
             self.price = data["price"]
             self.time_added = data["time_added"]
+            self.checkout = data["checkout"]
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Shopcart item: missing " + error.args[0]
