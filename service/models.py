@@ -17,11 +17,21 @@ price (decimal) - price at time item is placed in cart
 time_added (timestamp) - latest unix time item was added to the cart
 
 """
+import os
+import json
 import logging
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 logger = logging.getLogger("flask.app")
+
+# get configruation from enviuronment (12-factor)
+ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
+HOST = os.environ.get('HOST', 'localhost')
+USERNAME = os.environ.get('USERNAME', 'admin')
+PASSWORD = os.environ.get('PASSWORD', 'pass')
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
@@ -165,3 +175,88 @@ class Shopcart(db.Model):
     #     """
     #     logger.info("Processing name query for %s ...", name)
     #     return cls.query.filter(cls.name == name)
+
+############################################################
+#  P O S T G R E S Q L   D A T A B A S E   C O N N E C T I O N
+############################################################
+
+    @staticmethod
+    def init_db(dbname='csrkuvtx'):
+        """
+        Initialized Postgresql database connection
+        """
+        opts = {}
+        vcap_services = {}
+        # Try and get VCAP from the environment or a file if developing
+        if 'VCAP_SERVICES' in os.environ:
+            Shopcart.logger.info('Running in Bluemix mode.')
+            vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+        # # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
+        # elif 'BINDING_CLOUDANT' in os.environ:
+        #     Shopcart.logger.info('Found Kubernetes Bindings')
+        #     creds = json.loads(os.environ['BINDING_CLOUDANT'])
+        #     vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
+        else:
+            Shopcart.logger.info('VCAP_SERVICES and BINDING_CLOUDANT undefined.')
+            creds = {
+                "url": "postgres://csrkuvtx:UtfLipE9HDx5z9O9UHSZUNSL82kRglWt@kashin.db.elephantsql.com/csrkuvtx"
+            }
+            vcap_services = {"user-provided": [{"credentials": creds}]}
+
+        # Look for User-provided-service in VCAP_SERVICES
+        for service in vcap_services:
+            if service.startswith('user-provided'):
+                user_provided_service = vcap_services[service][0]
+                # opts['username'] = cloudant_service['credentials']['username']
+                # opts['password'] = cloudant_service['credentials']['password']
+                # opts['host'] = cloudant_service['credentials']['host']
+                # opts['port'] = cloudant_service['credentials']['port']
+                opts['url'] = user_provided_service['credentials']['url']
+
+        if any(k not in opts for k in ('url')):
+            Shopcart.logger.info('Error - Failed to retrieve options. ' \
+                             'Check that app is bound to a Cloudant service.')
+            exit(-1)
+
+            Shopcart.logger.info('ElephantSQL Endpoint: %s', opts['url'])
+        # try:
+        #     if ADMIN_PARTY:
+        #         Pet.logger.info('Running in Admin Party Mode...')
+        #     Pet.client = Cloudant(opts['username'],
+        #                           opts['password'],
+        #                           url=opts['url'],
+        #                           connect=True,
+        #                           auto_renew=True,
+        #                           admin_party=ADMIN_PARTY,
+        #                           adapter=Replay429Adapter(retries=10, initialBackoff=0.01)
+        #                          )
+        # except ConnectionError:
+        #     raise AssertionError('Cloudant service could not be reached')
+
+        try:
+            if ADMIN_PARTY:
+                Shopcart.logger.info('Running in Admin Party Mode...')
+            Shopcart.conn = psycopg2.connect(database=dbname,
+                                host=HOST,
+                                port='5432',
+                                user=USERNAME,
+                                password=PASSWORD)
+            Shopcart.conn.autocommit = True
+
+        except ConnectionError:
+            raise AssertionError('Cloudant service could not be reached')
+
+        # Create database if it doesn't exist
+        try:
+            Shopcart.conn = psycopg2.connect(database=dbname,
+                                         host=HOST,
+                                         port='5432',
+                                         user=USERNAME,
+                                         password=PASSWORD)
+            Shopcart.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        except KeyError:
+            cur = Shopcart.conn.cursor()
+            cur.execute(query = ("CREATE DATABASE {}").format(dbname))
+
+        if not Shopcart.database.exists():
+            raise AssertionError('Database [{}] could not be obtained'.format(dbname))
