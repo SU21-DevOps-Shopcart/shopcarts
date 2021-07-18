@@ -52,7 +52,7 @@ class TestYourResourceServer(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        
+
     def _create_item(self):
         time_freeze = datetime.utcnow()
         data = {
@@ -73,11 +73,11 @@ class TestYourResourceServer(TestCase):
         )
         return shopcart
 
-    def _create_item_with_id(self, id):
+    def _create_shopcart_with_item(self, shopcart_id, product_id):
         time_freeze = datetime.utcnow()
         data = {
-            "shopcart_id": 1234,
-            "product_id": id,
+            "shopcart_id": shopcart_id,
+            "product_id": product_id,
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
@@ -93,17 +93,19 @@ class TestYourResourceServer(TestCase):
         )
         return shopcart
 
+
     def test_index(self):
        """Test the Home Page"""
        resp = self.app.get("/")
        self.assertEqual(resp.status_code, status.HTTP_200_OK)
        data = resp.get_json()
        self.assertEqual(data["name"], "Shopcarts REST API Service")
-        
+
+
     def test_get_item(self):
         """Test Get a single Shopcart Item"""
         # get a shopcart item
-        shopcart = self._create_item()
+        shopcart = self._create_shopcart_with_item(1234, 100)
         resp = self.app.get(
             "/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id), content_type=CONTENT_TYPE_JSON
         )
@@ -111,10 +113,12 @@ class TestYourResourceServer(TestCase):
         data = resp.get_json()
         self.assertEqual(data["product_id"], shopcart.product_id)
 
+
     def test_get_item_not_found(self):
         """Test Get a Shopcart item thats not found"""
         resp = self.app.get("/shopcarts/0/items/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
 
     def test_create_item(self):
         """Test Create a new Shopcart item"""
@@ -155,6 +159,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_item["checkout"], shopcart.checkout, "checkout does not match")
         #self.assertEqual(new_item["time_added"], shopcart.time_added, "time_added does not match")
 
+
     def test_create_duplicate_item(self):
         """Test Create a Shopcart item that already exists"""
         time_freeze = datetime.utcnow()
@@ -178,25 +183,67 @@ class TestYourResourceServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
+
     def test_list_items(self):
         """ Test list items """
-        item1 = self._create_item_with_id(100)
-        item2 = self._create_item_with_id(101)
-        item3 = self._create_item_with_id(102)
-        resp = self.app.get("/shopcarts?shopcart_id=123")
+        item1 = self._create_shopcart_with_item(1234, 100)
+        item2 = self._create_shopcart_with_item(1234, 101)
+        item3 = self._create_shopcart_with_item(1234, 102)
+        resp = self.app.get("/shopcarts?shopcart_id={}".format(item1.shopcart_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         items = resp.get_json()
-        self.assertEqual(items[0]["shopcart_id"], 1234)
-        self.assertEqual(items[1]["shopcart_id"], 1234)
-        self.assertEqual(items[2]["shopcart_id"], 1234)
-        self.assertEqual(items[0]["product_id"], 100)
-        self.assertEqual(items[1]["product_id"], 101)
-        self.assertEqual(items[2]["product_id"], 102)
+        self.assertEqual(items[0]["shopcart_id"], item1.shopcart_id)
+        self.assertEqual(items[1]["shopcart_id"], item2.shopcart_id)
+        self.assertEqual(items[2]["shopcart_id"], item3.shopcart_id)
+        self.assertEqual(items[0]["product_id"], item1.product_id)
+        self.assertEqual(items[1]["product_id"], item2.product_id)
+        self.assertEqual(items[2]["product_id"], item3.product_id)
+        """ Test list items shopcart_id and product_id"""
+        item4 = self._create_shopcart_with_item(1234, 103)
+        resp = self.app.get("/shopcarts?shopcart_id={}&product_id={}".format(item4.shopcart_id, item4.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        items = resp.get_json()
+        self.assertEqual(items[0]["shopcart_id"], item4.shopcart_id)
+        self.assertEqual(items[0]["product_id"], item4.product_id)
+
+
+    def test_list_one_shopcart_item(self):
+        """ Test list one shopcart item """
+        item1 = self._create_shopcart_with_item(1234, 100)
+        item2 = self._create_shopcart_with_item(1234, 101)
+        item3 = self._create_shopcart_with_item(1234, 102)
+        resp = self.app.get("/shopcarts?shopcart_id={}&product_id={}".format(item1.shopcart_id, item1.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item1.product_id)
+        resp = self.app.get("/shopcarts?shopcart_id={}&product_id={}".format(item2.shopcart_id, item2.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item2.product_id)
+        resp = self.app.get("/shopcarts?shopcart_id={}&product_id={}".format(item3.shopcart_id, item3.product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        item = resp.get_json()
+        self.assertEqual(item[0]["product_id"], item3.product_id)
+
+
+    def test_list_all_shopcarts_with_item(self):
+        """ Test list all shopcarts with an item """
+        product_id = 100
+        item1 = self._create_shopcart_with_item(1234, product_id)
+        item2 = self._create_shopcart_with_item(1235, product_id)
+        item3 = self._create_shopcart_with_item(1236, product_id)
+        resp = self.app.get("/shopcarts?product-id={}".format(product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        items = resp.get_json()
+        self.assertEqual(items[0]["shopcart_id"], item1.shopcart_id)
+        self.assertEqual(items[1]["shopcart_id"], item2.shopcart_id)
+        self.assertEqual(items[2]["shopcart_id"], item3.shopcart_id)
+
 
     def test_update_an_item(self):
         """ Test update an existings items """
         #create a item
-        shopcart = self._create_item()
+        shopcart = self._create_shopcart_with_item(1234, 100)
         resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -250,14 +297,10 @@ class TestYourResourceServer(TestCase):
 
 
 
-
-
-
-
     def test_delete_an_item(self):
         """ Test delete a item """
         #add a item
-        shopcart = self._create_item()
+        shopcart = self._create_shopcart_with_item(1234, 100)
         resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         #delete the item
@@ -270,21 +313,21 @@ class TestYourResourceServer(TestCase):
 
     def test_delete_all_items(self):
         """Test delete all items"""
-        item1 = self._create_item_with_id(100)
-        item2 = self._create_item_with_id(101)
-        item3 = self._create_item_with_id(102)
+        item1 = self._create_shopcart_with_item(1234, 100)
+        item2 = self._create_shopcart_with_item(1234, 101)
+        item3 = self._create_shopcart_with_item(1234, 102)
 
-        resp = self.app.get("/shopcarts?shopcart_id=123")
+        resp = self.app.get("/shopcarts?shopcart_id=1234")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.get_json()), 3)
 
-        resp = self.app.put("/shopcarts/1234")
+        resp = self.app.delete("/shopcarts/1234")
 
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        resp = self.app.get("/shopcarts?shopcart_id=123")
+        resp = self.app.get("/shopcarts?shopcart_id=1234")
 
-        self.assertEqual(resp.get_json(), "no items found")
+        self.assertEqual(resp.get_json(), [])
 
     def test_checkout_item(self):
         """Test checkout item"""
@@ -341,5 +384,72 @@ class TestYourResourceServer(TestCase):
         
 
 
+    def test_read_items(self):
+        """ Test read items from a shopcart """
+        shopcart_id = 1234
+        item1 = self._create_shopcart_with_item(shopcart_id, 100)
+        item2 = self._create_shopcart_with_item(shopcart_id, 101)
+        item3 = self._create_shopcart_with_item(shopcart_id, 102)
+        resp = self.app.get("/shopcarts/{}".format(shopcart_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        items = resp.get_json()
+        self.assertEqual(items[0]["product_id"], item1.product_id)
+        self.assertEqual(items[1]["product_id"], item2.product_id)
+        self.assertEqual(items[2]["product_id"], item3.product_id)
     
 
+    def test_read_404(self):
+        """ Test read not found """
+        shopcart_id1 = 1231
+        shopcart_id2 = 1232
+        shopcart_id3 = 1233
+        shopcart_id1234 = 1234
+        product_id = 100
+        item1 = self._create_shopcart_with_item(shopcart_id1, product_id)
+        item2 = self._create_shopcart_with_item(shopcart_id2, product_id)
+        item3 = self._create_shopcart_with_item(shopcart_id3, product_id)
+        resp = self.app.get("/shopcarts/{}".format(shopcart_id1234))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_query_items_with_product_id(self):
+        """ Test list shopcarts with product id """
+        shopcart_id1 = 1231
+        shopcart_id2 = 1232
+        shopcart_id3 = 1233
+        product_id = 100
+        item1 = self._create_shopcart_with_item(shopcart_id1, product_id)
+        item2 = self._create_shopcart_with_item(shopcart_id2, product_id)
+        item3 = self._create_shopcart_with_item(shopcart_id3, product_id)
+        resp = self.app.get("/shopcarts?product_id={}".format(product_id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        items = resp.get_json()
+        self.assertEqual(items[0]["product_id"], item1.product_id)
+        self.assertEqual(items[1]["product_id"], item2.product_id)
+        self.assertEqual(items[2]["product_id"], item3.product_id)
+
+
+    # def test_bad_request(self):
+    #     """ Test error handlers bad request """
+    #     product_id = 1000
+    #     resp = self.app.get("/shopcarts?product-id{}".format(product_id, product_id))
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    # def test_server_error(self):
+    #     """ Test error handlers internal server error """
+    #     resp = self.app.put("/shopcarts?")
+    #     self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def test_method_not_allowed(self):
+            """ Test error handlers method not allowed """
+            resp = self.app.put("/shopcarts?")
+            self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+    def test_unsupported_media(self):
+        """ Test error handlers unsupported media type """
+        shopcart_id = 123
+        resp = self.app.post("/shopcarts/{}".format(shopcart_id))
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)

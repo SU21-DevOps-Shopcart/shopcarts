@@ -148,7 +148,17 @@ class Shopcart(db.Model):
                 shopcart_id (int): the shopcart id of the Shopcart you want to match
         """
         logger.info("Processing lookup for shopcart_id %d ...", shopcart_id)
-        return cls.query.filter(cls.shopcart_id == shopcart_id)
+        return cls.query.filter(cls.shopcart_id == shopcart_id).all()
+
+    @classmethod
+    def find_by_product_id(cls, product_id):
+        """ 
+            Returns all shopcarts that contain item by product_id 
+            Args:
+                product_id (int): the product id of the item you want to match
+        """
+        logger.info("Processing lookup for product_id %d ...", product_id)
+        return cls.query.filter(cls.product_id == product_id)
 
     # @classmethod
     # def find_by_name(cls, name):

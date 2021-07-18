@@ -26,6 +26,7 @@ from service.models import Shopcart, DataValidationError
 # Import Flask application
 from . import app
 
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -42,30 +43,35 @@ def index():
         status.HTTP_200_OK,
     )
 
-######################################################################
+
+#####################################################################
 # LIST ALL ITEMS
-######################################################################
+#####################################################################
 @app.route("/shopcarts", methods=["GET"])
 def list_items():
     """ Return all of the Shopcarts """
     app.logger.info("Request for Shopcarts list")
     shopcarts = []
     results = []
-    shopcart_id = request.args.get("shopcart-id")
-    product_id = request.args.get("product-id")
+    shopcart_param = request.args.get("shopcart_id")
+    product_param = request.args.get("product_id")
+    shopcart_id = (int(shopcart_param)) if shopcart_param else None
+    product_id = (int(product_param)) if product_param else None
     if shopcart_id and product_id:
         shopcarts = Shopcart.find(shopcart_id, product_id)
-    elif shopcart_id:
+    elif not shopcart_id and product_id:
+        shopcarts = Shopcart.find_by_product_id(product_id)
+    elif shopcart_id and not product_id:
         shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
     else:
         shopcarts = Shopcart.all()
 
     if not shopcarts:
             app.logger.info("Returning 0 items")
-            message = "no items found"
+            message = []
             return make_response(
                 jsonify(message),
-                status.HTTP_200_OK
+                status.HTTP_404_NOT_FOUND
             )
     if shopcart_id and product_id:
         results = [shopcarts.serialize()]
@@ -76,6 +82,33 @@ def list_items():
         jsonify(results),
         status.HTTP_200_OK
     )
+
+
+######################################################################
+# READ ITEMS FROM A CUSTOMER'S SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def list_items_in_shopcart(shopcart_id):
+    """ Read items from a customer's Shopcart """
+    app.logger.info("Request an item from the Shopcart")
+
+    shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+
+    if not shopcarts:
+            app.logger.info("Returning 0 items")
+            message = []
+            return make_response(
+                jsonify(message),
+                status.HTTP_404_NOT_FOUND
+            )
+
+    results = [items.serialize() for items in shopcarts]
+    app.logger.info("Returning %d items", len(results))
+    return make_response(
+        jsonify(results),
+        status.HTTP_200_OK
+    )
+
 
 ######################################################################
 # UPDATE AN EXISTING ITEM
@@ -148,9 +181,6 @@ def checkout_item(shopcart_id,product_id):
             shopcart.update()
             return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
-
-
-
 ######################################################################
 # DELETE A ITEM
 ######################################################################
@@ -176,7 +206,7 @@ def delete_item(shopcart_id,product_id):
 # CLEAR SHOPCART
 ######################################################################
 
-@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
 def clear_shopcart(shopcart_id):
     """
     Delete All items in specific cart
