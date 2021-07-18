@@ -13,7 +13,7 @@ DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
 import os
 import sys
 import logging
-from flask import Flask, json, jsonify, request, url_for, make_response, abort
+from flask import Flask, json, jsonify, request, url_for, make_response, abort, send_from_directory
 from flask_api import status  # HTTP Status Codes
 from . import status # HTTP Status Codes
 from werkzeug.exceptions import NotFound
@@ -29,18 +29,12 @@ from . import app
 ######################################################################
 # GET INDEX
 ######################################################################
+
 @app.route("/")
 def index():
     """ Root URL response """
-    app.logger.info("Request for root URL")
-    return (
-        jsonify(
-            name="Shopcarts REST API Service",
-            version="1.0",
-            #paths=url_for("list_items", _external=True)
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
+
 
 #####################################################################
 # LIST ALL ITEMS
