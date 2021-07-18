@@ -227,7 +227,27 @@ class TestYourResourceServer(TestCase):
         updated_item = resp.get_json()
         self.assertEqual(updated_item['price'], 3.9)
         self.assertEqual(updated_item['quantity'], 3)
-      #  self.assertEqual(updated_item['time_added'], time_freeze)
+
+        #update item does not exist
+        time_freeze = datetime.utcnow()
+        data = {
+            "shopcart_id": 124,
+            "product_id": 5678,
+            "quantity": 1,
+            "price": 0.01,
+            "time_added": time_freeze,
+            "checkout" : 0
+        }
+
+        resp = self.app.put(
+            "/shopcarts/123456/items/123",
+            json=data,
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
 
 
 
@@ -268,18 +288,55 @@ class TestYourResourceServer(TestCase):
 
     def test_checkout_item(self):
         """Test checkout item"""
+
+        #create item
         item = self._create_item_with_id(100)
         resp = self.app.get("/shopcarts/1234/items/100")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 0)
-
-        print(information)
-
-        resp = self.app.put("/shopcarts/1234/items/100/checkout")
+        
+        #test change checkout status
+        resp = self.app.put("/shopcarts/1234/items/100/checkout",
+                            json=information,
+                            content_type="application/json",
+            )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 1)
+
+        #test change checkout item already checkout
+        resp = self.app.put("/shopcarts/1234/items/100/checkout",
+                            json=information,
+                            content_type="application/json",
+            )
+
+        information = resp.get_json()
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+
+        #test change status of item does not exist
+        time_freeze = datetime.utcnow()
+        data = {
+            "shopcart_id": 124,
+            "product_id": 5678,
+            "quantity": 1,
+            "price": 0.01,
+            "time_added": time_freeze,
+            "checkout" : 0
+        }
+
+        resp = self.app.put("/shopcarts/12345/items/100/checkout",
+                            json=data,
+                            content_type="application/json",
+            )
+        
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        
+
+
+
 
         
 
