@@ -16,7 +16,7 @@ This project emulates Customer's shopcart. Actions like add items to shopcart, d
 
 You should clone this repository and the copy and paste the code into your project repo folder on your local computer.
 
-```bash
+````bash
 
 ## Contents
 
@@ -33,6 +33,14 @@ service/            - service python package
 ├── __init__.py     - package initializer
 ├── models.py       - module with business models
 └── service.py      - module with service routes
+└── public          - static files for shopcarts UI
+
+features/
+├── steps/                - package initializer
+├──── shopcarts_steps.py  - BDD unit tests
+├──── web_steps.py        - prep data
+└── environemnt.py        - headless chrome env setup
+└── shopcarts.feature     - BDD scenarios
 
 tests/              - test cases package
 ├── __init__.py     - package initializer
@@ -40,7 +48,7 @@ tests/              - test cases package
 └── test_service.py - test suite for service routes
 
 Vagrantfile         - Vagrant file that installs Python 3 and PostgreSQL
-```
+````
 
 Before running this project, make sure **virtualbox** , **vagrant**, and **postman** are installed.
 
@@ -59,12 +67,16 @@ cd /vagrant
 1. Running up project
 
    ```sh
+   # Using flask
    FLASK_APP=service:app flask run -h 0.0.0.0
+
+   # Using honcho
+   honcho start
    ```
 
 2. open up postman
 3. customer 1234 wants to add an item to shopcart,
-   set following in **postman** and press **send**     button
+   set following in **postman** and press **send** button
 
    ```sh
    POST localhost:5000/shopcarts/1234
@@ -77,17 +89,17 @@ cd /vagrant
    }
    ```
 
-    The server should response with following information, time_added will be different depend on when item is added
+   The server should response with following information, time_added will be different depend on when item is added
 
-    ```sh
-    {
-        "price": 4.01,
-        "product_id": 54,
-        "quantity": 1,
-        "shopcart_id": 1234,
-        "time_added": "Wed, 07 Jul 2021 07:10:26 GMT"
-    }
-    ```
+   ```sh
+   {
+       "price": 4.01,
+       "product_id": 54,
+       "quantity": 1,
+       "shopcart_id": 1234,
+       "time_added": "Wed, 07 Jul 2021 07:10:26 GMT"
+   }
+   ```
 
 4. Test if item is created, set following in **postman** and press **send** button
 
@@ -120,11 +132,11 @@ cd /vagrant
    }
    ```
 
-    The server should response with following information
+   The server should response with following information
 
-    ```sh
-    "item already exists"
-    ```
+   ```sh
+   "item already exists"
+   ```
 
 6. Add different item using create item feature.
 
@@ -139,17 +151,17 @@ cd /vagrant
     }
    ```
 
-    The server should response with following information, time_added will be different depend on when item is added
+   The server should response with following information, time_added will be different depend on when item is added
 
-    ```sh
-    {
-        "price": 4.01,
-        "product_id": 55,
-        "quantity": 1,
-        "shopcart_id": 1234,
-        "time_added": "Wed, 07 Jul 2021 08:38:55 GMT"
-    }
-    ```
+   ```sh
+   {
+       "price": 4.01,
+       "product_id": 55,
+       "quantity": 1,
+       "shopcart_id": 1234,
+       "time_added": "Wed, 07 Jul 2021 08:38:55 GMT"
+   }
+   ```
 
 7. List all items in shopcarts
 
@@ -191,32 +203,32 @@ cd /vagrant
     }
    ```
 
-9.  Customer 1234 want to see his or her shopcart
+9. Customer 1234 want to see his or her shopcart
 
-    ```sh
-    GET localhost:5000/shopcarts?shopcart-id=1234
-    ```
+   ```sh
+   GET localhost:5000/shopcarts?shopcart-id=1234
+   ```
 
-    The server should response with following information, time_added will be different depend on when item is added
+   The server should response with following information, time_added will be different depend on when item is added
 
-    ```sh
-    [
-        {
-            "price": 4.01,
-            "product_id": 54,
-            "quantity": 1,
-            "shopcart_id": 1234,
-            "time_added": "Wed, 07 Jul 2021 08:35:54 GMT"
-        },
-        {
-            "price": 4.01,
-            "product_id": 55,
-            "quantity": 1,
-            "shopcart_id": 1234,
-            "time_added": "Wed, 07 Jul 2021 08:38:55 GMT"
-        }
-    ]
-    ```
+   ```sh
+   [
+       {
+           "price": 4.01,
+           "product_id": 54,
+           "quantity": 1,
+           "shopcart_id": 1234,
+           "time_added": "Wed, 07 Jul 2021 08:35:54 GMT"
+       },
+       {
+           "price": 4.01,
+           "product_id": 55,
+           "quantity": 1,
+           "shopcart_id": 1234,
+           "time_added": "Wed, 07 Jul 2021 08:38:55 GMT"
+       }
+   ]
+   ```
 
 10. customer 1234 want to add one more item 54 to his or her shopcart, but the price of item 54 changed because of Black Friday!
 
@@ -330,10 +342,42 @@ cd /vagrant
     []
     ```
 
+## UI and BDD
+
+The shopcarts UI is saved in the public folder. To see it, run the flask server and go to http://localhost:5000/ in your browser.
+
+Two ways to run the BDD tests:
+
+1. Start honcho in the background and run the test
+
+```sh
+honcho start &
+
+# Then
+behave
+```
+
+To retrieve a program running in the background, use the command:
+
+```sh
+fg
+```
+
+2. Start honcho in 1 terminal and run behave in another terminal
+
+```sh
+# In 1 terminal
+honcho start
+
+# In a separate terminal
+behave
+```
+
+If the tests fail, try running the server and going to the base url first to make sure that it loads properly and then try running the tests.
+
 ## Shut down machine
 
 1. press `ctr` + `c` and input `exit` to get out of virtual machine
 2. input `vagrant halt` to shut down virtual machine
-
 
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.

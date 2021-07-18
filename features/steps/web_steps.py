@@ -106,7 +106,7 @@ def step_impl(context, element_name):
 def step_impl(context, button):
     button_id = ID_PREFIX + button.lower().replace(" ","-") + '-btn'
     context.driver.find_element_by_id(button_id).click()
-    time.sleep(0.05) 
+    time.sleep(0.1)
 
 ##################################################################
 # This code works because of the following naming convention:
