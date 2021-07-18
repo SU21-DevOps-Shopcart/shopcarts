@@ -189,15 +189,15 @@ class Shopcart(db.Model):
         vcap_services = {}
         # Try and get VCAP from the environment or a file if developing
         if 'VCAP_SERVICES' in os.environ:
-            Shopcart.logger.info('Running in Bluemix mode.')
+            logger.info('Running in Bluemix mode.')
             vcap_services = json.loads(os.environ['VCAP_SERVICES'])
         # # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         # elif 'BINDING_CLOUDANT' in os.environ:
-        #     Shopcart.logger.info('Found Kubernetes Bindings')
+        #     logger.info('Found Kubernetes Bindings')
         #     creds = json.loads(os.environ['BINDING_CLOUDANT'])
         #     vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
         else:
-            Shopcart.logger.info('VCAP_SERVICES and BINDING_CLOUDANT undefined.')
+            logger.info('VCAP_SERVICES and BINDING_CLOUDANT undefined.')
             creds = {
                 "url": "postgres://csrkuvtx:UtfLipE9HDx5z9O9UHSZUNSL82kRglWt@kashin.db.elephantsql.com/csrkuvtx"
             }
@@ -214,11 +214,11 @@ class Shopcart(db.Model):
                 opts['url'] = user_provided_service['credentials']['url']
 
         if any(k not in opts for k in ('url')):
-            Shopcart.logger.info('Error - Failed to retrieve options. ' \
+            logger.info('Error - Failed to retrieve options. ' \
                              'Check that app is bound to a Cloudant service.')
             exit(-1)
 
-            Shopcart.logger.info('ElephantSQL Endpoint: %s', opts['url'])
+            logger.info('ElephantSQL Endpoint: %s', opts['url'])
         # try:
         #     if ADMIN_PARTY:
         #         Pet.logger.info('Running in Admin Party Mode...')
@@ -235,7 +235,7 @@ class Shopcart(db.Model):
 
         try:
             if ADMIN_PARTY:
-                Shopcart.logger.info('Running in Admin Party Mode...')
+                logger.info('Running in Admin Party Mode...')
             Shopcart.conn = psycopg2.connect(database=dbname,
                                 host=HOST,
                                 port='5432',
