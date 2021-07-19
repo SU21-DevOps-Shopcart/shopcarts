@@ -63,12 +63,13 @@ class TestShopcartModel(unittest.TestCase):
     def test_create_an_item(self):
         """Create a item and assert that it exists"""
         time_freeze = datetime.utcnow()
-        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         self.assertTrue(shopcart != None)
         self.assertEqual(shopcart.shopcart_id, 1234)
         self.assertEqual(shopcart.product_id, 5678)
         self.assertEqual(shopcart.quantity, 1)
         self.assertEqual(shopcart.price, 5.99)
+        self.assertEqual(shopcart.checkout, 0)
         self.assertEqual(shopcart.time_added, time_freeze)
     
     def test_create_an_item_in_a_shopcart(self):
@@ -76,7 +77,7 @@ class TestShopcartModel(unittest.TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         time_freeze = datetime.utcnow()
-        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze,checkout=0)
         self.assertTrue(shopcart != None)
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
@@ -88,13 +89,14 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcarts[0].quantity, 1)
         self.assertEqual(shopcarts[0].price, 5.99)
         self.assertEqual(shopcarts[0].time_added, time_freeze)
+        self.assertEqual(shopcarts[0].checkout, 0)
 
     def test_update_to_an_item_in_a_shopcart(self):
         """Create an item in the shopcart database and update the quantity"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         time_freeze = datetime.utcnow()
-        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         self.assertTrue(shopcart != None)
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
@@ -109,11 +111,13 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcarts[0].quantity, 2)
         self.assertEqual(shopcarts[0].price, 5.99)
         self.assertEqual(shopcarts[0].time_added, time_freeze)
+        self.assertEqual(shopcarts[0].checkout, 0)
+
 
     def test_delete_an_item(self):
         """Delete a Shopcart item"""
         time_freeze = datetime.utcnow()
-        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         shopcart.create()
         self.assertEqual(len(Shopcart.all()), 1)
         # delete the item and make sure it isn't in the database
@@ -123,7 +127,7 @@ class TestShopcartModel(unittest.TestCase):
     def test_serialize_a_shopcart_item(self):
         """Test serialization of a Shopcart item"""
         time_freeze = datetime.utcnow()
-        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         data = shopcart.serialize()
         self.assertNotEqual(data, None)
         self.assertIn("shopcart_id", data)
@@ -136,6 +140,8 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(data["price"], shopcart.price)
         self.assertIn("time_added", data)
         self.assertEqual(data["time_added"], shopcart.time_added)
+        self.assertIn("checkout", data)
+        self.assertEqual(data["checkout"], shopcart.checkout)
 
     def test_deserialize_a_Shopcart_item(self):
         """Test deserialization of a Shopcart item"""
@@ -146,6 +152,7 @@ class TestShopcartModel(unittest.TestCase):
             "quantity": 1,
             "price": 0.01,
             "time_added": time_freeze,
+            "checkout" : 0
         }
         shopcart = Shopcart()
         shopcart.deserialize(data)
@@ -155,10 +162,11 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcart.quantity, 1)
         self.assertEqual(shopcart.price, 0.01)
         self.assertEqual(shopcart.time_added, time_freeze)
+        self.assertEqual(shopcart.checkout, 0)
 
     def test_deserialize_missing_data(self):
         """Test deserialization of a Shopcart item with missing data"""
-        data = {"shopcart_id": 1, "product_id": 999, "price": 0.05}
+        data = {"shopcart_id": 1, "product_id": 999, "price": 0.05, "checkout":0}
         shopcart = Shopcart()
         self.assertRaises(DataValidationError, shopcart.deserialize, data)
         
@@ -172,15 +180,15 @@ class TestShopcartModel(unittest.TestCase):
         """Find a Shopcart item by shopcart_id and product_id"""
         # make Shopcart item #1
         time_freeze = datetime.utcnow()
-        shopcart_1 = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart_1 = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         shopcart_1.create()
         # make Shopcart item #2
         time_freeze = datetime.utcnow()
-        shopcart_2 = Shopcart(shopcart_id=1235, product_id=6678, quantity=1, price=6.00, time_added=time_freeze)
+        shopcart_2 = Shopcart(shopcart_id=1235, product_id=6678, quantity=1, price=6.00, time_added=time_freeze, checkout=0)
         shopcart_2.create()
         # make Shopcart item #3
         time_freeze = datetime.utcnow()
-        shopcart_3 = Shopcart(shopcart_id=1236, product_id=7678, quantity=1, price=9.99, time_added=time_freeze)
+        shopcart_3 = Shopcart(shopcart_id=1236, product_id=7678, quantity=1, price=9.99, time_added=time_freeze, checkout=0)
         shopcart_3.create()
 
         # make sure they got saved
@@ -193,20 +201,21 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcart.quantity, shopcart_2.quantity)
         self.assertEqual(shopcart.price, shopcart_2.price)
         self.assertEqual(shopcart.time_added, shopcart_2.time_added)
+        self.assertEqual(shopcart.checkout, shopcart_2.checkout)
 
     def test_find_or_404_found(self):
         """Find or return 404 found"""
         # make Shopcart item #1
         time_freeze = datetime.utcnow()
-        shopcart_1 = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart_1 = Shopcart(shopcart_id=1234, product_id=5678, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         shopcart_1.create()
         # make Shopcart item #2
         time_freeze = datetime.utcnow()
-        shopcart_2 = Shopcart(shopcart_id=1235, product_id=6678, quantity=1, price=6.00, time_added=time_freeze)
+        shopcart_2 = Shopcart(shopcart_id=1235, product_id=6678, quantity=1, price=6.00, time_added=time_freeze, checkout=0)
         shopcart_2.create()
         # make Shopcart item #3
         time_freeze = datetime.utcnow()
-        shopcart_3 = Shopcart(shopcart_id=1236, product_id=7678, quantity=1, price=9.99, time_added=time_freeze)
+        shopcart_3 = Shopcart(shopcart_id=1236, product_id=7678, quantity=1, price=9.99, time_added=time_freeze, checkout=0)
         shopcart_3.create()
 
         # make sure they got saved
@@ -219,6 +228,7 @@ class TestShopcartModel(unittest.TestCase):
         self.assertEqual(shopcart.quantity, shopcart_2.quantity)
         self.assertEqual(shopcart.price, shopcart_2.price)
         self.assertEqual(shopcart.time_added, shopcart_2.time_added)
+        self.assertEqual(shopcart.checkout, shopcart_2.checkout)
 
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
@@ -228,15 +238,15 @@ class TestShopcartModel(unittest.TestCase):
         """Test Find items by shopcart_id """
         # make Shopcart item #1
         time_freeze = datetime.utcnow()
-        shopcart_1 = Shopcart(shopcart_id=1234, product_id=100, quantity=1, price=5.99, time_added=time_freeze)
+        shopcart_1 = Shopcart(shopcart_id=1234, product_id=100, quantity=1, price=5.99, time_added=time_freeze, checkout=0)
         shopcart_1.create()
         # make Shopcart item #2
         time_freeze = datetime.utcnow()
-        shopcart_2 = Shopcart(shopcart_id=1234, product_id=101, quantity=1, price=6.00, time_added=time_freeze)
+        shopcart_2 = Shopcart(shopcart_id=1234, product_id=101, quantity=1, price=6.00, time_added=time_freeze, checkout=0)
         shopcart_2.create()
         # make Shopcart item #3
         time_freeze = datetime.utcnow()
-        shopcart_3 = Shopcart(shopcart_id=1234, product_id=102, quantity=1, price=9.99, time_added=time_freeze)
+        shopcart_3 = Shopcart(shopcart_id=1234, product_id=102, quantity=1, price=9.99, time_added=time_freeze, checkout=0)
         shopcart_3.create()
 
         # make sure they got saved
