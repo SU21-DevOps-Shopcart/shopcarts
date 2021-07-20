@@ -158,7 +158,6 @@ def checkout_item(shopcart_id,product_id):
     """
     app.logger.info("Request to checkout item in shopcart: %s with id: %s",shopcart_id, product_id)
     check_content_type("application/json")
-    print("params", shopcart_id, product_id)
 
     shopcart = Shopcart.find(shopcart_id, product_id)
     
@@ -226,7 +225,6 @@ def clear_shopcart(shopcart_id):
 
     if results:
         for i in results:
-            print(i)
             shopcart = Shopcart.find(shopcart_id, i['product_id'])
             shopcart.delete()
     return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
