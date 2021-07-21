@@ -340,22 +340,14 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(information["checkout"], 0)
         
         #test change checkout status
-        resp = self.app.put("/shopcarts/1234/items/5678/checkout",
-                            json=information,
-                            content_type="application/json",
-            )
+        resp = self.app.put("/shopcarts/1234/items/5678/checkout")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 1)
 
         #test change checkout item already checkout
-        resp = self.app.put("/shopcarts/1234/items/5678/checkout",
-                            json=information,
-                            content_type="application/json",
-            )
-
-        information = resp.get_json()
-        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+        resp = self.app.put("/shopcarts/1234/items/5678/checkout",)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         #test change status of item does not exist
         time_freeze = datetime.utcnow()
@@ -368,10 +360,7 @@ class TestYourResourceServer(TestCase):
             "checkout" : 0
         }
 
-        resp = self.app.put("/shopcarts/12345/items/100/checkout",
-                            json=data,
-                            content_type="application/json",
-            )
+        resp = self.app.put("/shopcarts/12345/items/100/checkout",)
         
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -453,3 +442,30 @@ class TestYourResourceServer(TestCase):
         shopcart_id = 123
         resp = self.app.post("/shopcarts/{}".format(shopcart_id))
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_checkout_all_items(self):
+        """ Test checkout all items"""
+        #test with no shopcart 
+        resp = self.app.put("/shopcarts/{}/checkout".format(1234))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        #test with checkout all items in shopcart
+        item1 = self._create_shopcart_with_item(1234, 100)
+        item2 = self._create_shopcart_with_item(1234, 101)
+        item3 = self._create_shopcart_with_item(1234, 102)
+
+        resp = self.app.put("/shopcarts/{}/checkout".format(1234))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        result = resp.get_json()
+
+        for shopcart in result:
+            self.assertEqual(shopcart['checkout'], 1)
+        
+
+
+
+        
+
+
+        

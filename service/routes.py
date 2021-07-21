@@ -154,7 +154,6 @@ def checkout_item(shopcart_id,product_id):
     This endpoint will update a item based the body that is posted
     """
     app.logger.info("Request to checkout item in shopcart: %s with id: %s",shopcart_id, product_id)
-    check_content_type("application/json")
 
     shopcart = Shopcart.find(shopcart_id, product_id)
 
@@ -163,23 +162,41 @@ def checkout_item(shopcart_id,product_id):
     
     else:
         shopcart_dict_database = shopcart.serialize()
-        checkout = shopcart_dict_database['checkout']
-        if checkout == 1:
-            message = "item already checkout"
-            location_url = url_for("checkout_item", shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+        app.logger.info("changing checkout status from 0 to 1")
+        shopcart_dict_database['checkout'] = str(1)
+        shopcart.deserialize(shopcart_dict_database)
+        shopcart.update()
+        return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
-            app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d already checkout", shopcart.shopcart_id, shopcart.product_id)
-            return make_response(
-            jsonify(message), status.HTTP_409_CONFLICT, {"Location": location_url}
-            )
-        elif checkout == 0:
-            app.logger.info("changing checkout status from 0 to 1")
-            request_dict = request.get_json()
-            request_dict['checkout'] = str(1)
-            request_dict['shopcart_id'] = shopcart_id
-            shopcart.deserialize(request_dict)
+######################################################################
+# CHECKOUT ALL ITEM IN SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["PUT"])
+def checkout_shopcarts(shopcart_id):
+    """
+    Checkout all item in shopcart
+
+    This endpoint will update a item based the body that is posted
+    """
+    app.logger.info("Request to checkout all items in shopcart: %s",shopcart_id)
+    shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+
+    if not shopcarts:
+        raise NotFound("item with shopcart id '{}' was not found.".format(shopcart_id))
+    
+    else:
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        print(results)
+        for product in results:
+            print(product)
+            product_id = product['product_id']
+            product['checkout'] = str(1)
+            shopcart = Shopcart.find(shopcart_id, product_id)
+            shopcart.deserialize(product)
             shopcart.update()
-            return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        return make_response(jsonify(results),status.HTTP_200_OK)
 
 ######################################################################
 # DELETE A ITEM
