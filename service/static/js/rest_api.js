@@ -9,6 +9,11 @@ $(function () {
     $("#shopcart_product_id").val(res.product_id);
     $("#shopcart_quantity").val(res.quantity);
     $("#shopcart_price").val(res.price);
+    if (res.checkout == "1") {
+      $("#shopcart_checkout").val("true");
+    } else {
+      $("#shopcart_checkout").val("false");
+    }
   }
 
   /// Clears all form fields
@@ -34,13 +39,14 @@ $(function () {
     var product_id = $("#shopcart_product_id").val();
     var quantity = $("#shopcart_quantity").val();
     var price = $("#shopcart_price").val();
+    var checkout = $("#shopcart_checkout").val() == "true" ? "1" : "0";
 
     var data = {
       product_id: product_id,
       quantity: parseInt(quantity),
       price: price,
       time_added: new Date(),
-      checkout: "0",
+      checkout: checkout,
     };
 
     var ajax = $.ajax({
@@ -71,13 +77,14 @@ $(function () {
     var product_id = $("#shopcart_product_id").val();
     var quantity = $("#shopcart_quantity").val();
     var price = $("#shopcart_price").val();
+    var checkout = $("#shopcart_checkout").val() == "true" ? "1" : "0";
 
     var data = {
       product_id: product_id,
       quantity: parseInt(quantity),
       price: price,
       time_added: new Date(),
-      checkout: "0",
+      checkout: checkout,
     };
 
     var ajax = $.ajax({
@@ -229,10 +236,13 @@ $(function () {
           </thead>
       `;
 
-      var firstItem = "";
+      var firstItem = false;
       var rows = res.map((item) => {
         // copy the first result to the form
-        if (!firstItem) update_form_data(item);
+        if (!firstItem) {
+          firstItem = true;
+          update_form_data(item);
+        }
         // build table
         return `<tr><td class="text-center">
           ${item.shopcart_id}
@@ -283,6 +293,28 @@ $(function () {
       url: `/shopcarts/${shopcart_id}/items/${product_id}/checkout`,
       contentType: "application/json",
       data: JSON.stringify(data),
+    });
+
+    ajax.done(function (res) {
+      update_form_data(res);
+      flash_message("Success");
+      $("#flash_message").attr("class", "text-success");
+    });
+
+    ajax.fail(function (res) {
+      flash_message(res.responseJSON.message);
+      $("#flash_message").attr("class", "text-danger");
+    });
+  });
+
+  $("#checkout-all-btn").click(function () {
+    var shopcart_id = $("#shopcart_customer_id").val();
+
+    var ajax = $.ajax({
+      type: "PUT",
+      url: `/shopcarts/${shopcart_id}/checkout`,
+      contentType: "application/json",
+      data: JSON.stringify({}),
     });
 
     ajax.done(function (res) {
