@@ -17,11 +17,15 @@ price (decimal) - price at time item is placed in cart
 time_added (timestamp) - latest unix time item was added to the cart
 checkout (integer) - checkout status
 """
+import os
+import json
 import logging
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+
 logger = logging.getLogger("flask.app")
+
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
@@ -169,3 +173,4 @@ class Shopcart(db.Model):
     #     """
     #     logger.info("Processing name query for %s ...", name)
     #     return cls.query.filter(cls.name == name)
+
