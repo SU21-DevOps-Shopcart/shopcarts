@@ -34,14 +34,17 @@ from . import app
 def index():
     """ Root URL response """
     app.logger.info("Request for root URL")
-    return (
-        jsonify(
-            name="Shopcarts REST API Service",
-            version="1.0",
-            #paths=url_for("list_items", _external=True)
-        ),
-        status.HTTP_200_OK,
-    )
+    # return (
+    #     jsonify(
+    #         name="Shopcarts REST API Service",
+    #         version="1.0",
+    #         #paths=url_for("list_items", _external=True)
+    #     ),
+    #     status.HTTP_200_OK,
+    # )
+    
+    ## Return html instead of json
+    return app.send_static_file("index.html")
 
 
 #####################################################################
@@ -157,6 +160,7 @@ def checkout_item(shopcart_id,product_id):
     check_content_type("application/json")
 
     shopcart = Shopcart.find(shopcart_id, product_id)
+    
 
     if not shopcart:
         raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
@@ -221,7 +225,6 @@ def clear_shopcart(shopcart_id):
 
     if results:
         for i in results:
-            print(i)
             shopcart = Shopcart.find(shopcart_id, i['product_id'])
             shopcart.delete()
     return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
@@ -261,6 +264,7 @@ def create_item(shopcart_id):
     shopcart = Shopcart()
     data = request.get_json()
     data["shopcart_id"] = shopcart_id
+
     shopcart.deserialize(data)
     item = Shopcart.find(shopcart_id, data["product_id"])
     if not item:
