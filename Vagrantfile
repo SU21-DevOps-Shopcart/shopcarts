@@ -87,6 +87,7 @@ Vagrant.configure(2) do |config|
     #install Python 3 and dev tools
     apt-get update
     apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
+    apt-get install -y python3-selenium
     apt-get -y autoremove
 
     # Install Chromium Drive
