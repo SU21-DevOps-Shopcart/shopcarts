@@ -8,8 +8,8 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "bento/ubuntu-20.04"
-  #config.vm.box = "ubuntu/focal64"
+  # config.vm.box = "bento/ubuntu-20.04"
+  config.vm.box = "ubuntu/focal64"
   config.vm.hostname = "ubuntu"
 
   # accessing "localhost:8080" will access port 80 on the guest machine.
@@ -87,8 +87,11 @@ Vagrant.configure(2) do |config|
     #install Python 3 and dev tools
     apt-get update
     apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
+    apt-get install -y python3-selenium
     apt-get -y autoremove
 
+    # Install Chromium Drive
+    apt-get install -y chromium-chromedriver
     
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
