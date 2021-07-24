@@ -74,7 +74,7 @@ def list_items():
             message = []
             return make_response(
                 jsonify(message),
-                status.HTTP_404_NOT_FOUND
+                status.HTTP_200_OK
             )
     if shopcart_id and product_id:
         results = [shopcarts.serialize()]

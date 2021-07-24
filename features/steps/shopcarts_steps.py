@@ -34,6 +34,7 @@ def step_impl(context):
     headers = {'Content-Type': 'application/json'}
     # list all of the shopcart items and delete them one by one
     context.resp = requests.get(context.base_url + '/shopcarts', headers=headers)
+    #print(context.resp.status_code)
     expect(context.resp.status_code).to_equal(200)
     for item in context.resp.json():
         context.resp = requests.delete(context.base_url + '/shopcarts/' + str(item["shopcart_id"]) + '/items/' + str(item["product_id"]), headers=headers)
@@ -47,6 +48,7 @@ def step_impl(context):
             'quantity': row['quantity'],
             'price': row['price'],
             'time_added': str(datetime.now()),
+            'checkout': 0
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
