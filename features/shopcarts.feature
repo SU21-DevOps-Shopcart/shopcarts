@@ -36,3 +36,23 @@ Scenario: Create a Shopcart
     And I should see "12" in the "Product_ID" field
     And I should see "1" in the "Quantity" field
     And I should see "1" in the "Price" field
+
+Scenario: List all Items in one shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    Then I should see "1" in the results
+    And I should see "2" in the results
+    And I should see "3" in the results
+    And I should not see "5678" in the results
+
+
+Scenario: Delete a product in shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    Then I should see "1" in the results
+    And I should see "2" in the results
+    And I should see "3" in the results
