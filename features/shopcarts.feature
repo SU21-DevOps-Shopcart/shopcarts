@@ -66,3 +66,25 @@ Scenario: Delete a product in shopcart
     And I press the "Retrieve" button
     Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
     
+Scenario: Update one item in a Shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "1234" in the results
+    And I should see "1" in the results
+    And I should see "1" in the results
+    And I should see "0.99" in the results
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    And I press the "Retrieve" button
+    And I change "Quantity" to "2"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    And I press the "Retrieve" button
+    Then I should see "2" in the "Quantity" field
