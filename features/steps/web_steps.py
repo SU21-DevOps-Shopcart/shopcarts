@@ -111,6 +111,7 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
+<<<<<<< HEAD
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
@@ -118,6 +119,15 @@ def step_impl(context, name):
         )
     )
     expect(found).to_be(True)
+=======
+     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+         expected_conditions.text_to_be_present_in_element(
+             (By.ID, 'search_results'),
+             name
+         )
+     )
+     expect(found).to_be(True)
+>>>>>>> main
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
