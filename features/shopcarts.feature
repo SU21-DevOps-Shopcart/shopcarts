@@ -45,3 +45,14 @@ Scenario: Delete a product in shopcart
     Then I should see "1" in the results
     And I should see "2" in the results
     And I should see "3" in the results
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    When I press the "Delete" button
+    Then I should see the message "Item has been Deleted!"
+    When I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1" 
+    And I press the "Retrieve" button
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
+    
+
