@@ -56,17 +56,17 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
-# @when('I select "{text}" in the "{element_name}" dropdown')
-# def step_impl(context, text, element_name):
-#     element_id = ID_PREFIX + element_name.lower()
-#     element = Select(context.driver.find_element_by_id(element_id))
-#     element.select_by_visible_text(text)
+@when('I select "{text}" in the "{element_name}" dropdown')
+def step_impl(context, text, element_name):
+    element_id = ID_PREFIX + element_name.lower()
+    element = Select(context.driver.find_element_by_id(element_id))
+    element.select_by_visible_text(text)
 
-# @then('I should see "{text}" in the "{element_name}" dropdown')
-# def step_impl(context, text, element_name):
-#     element_id = ID_PREFIX + element_name.lower()
-#     element = Select(context.driver.find_element_by_id(element_id))
-#     expect(element.first_selected_option.text).to_equal(text)
+@then('I should see "{text}" in the "{element_name}" dropdown')
+def step_impl(context, text, element_name):
+    element_id = ID_PREFIX + element_name.lower()
+    element = Select(context.driver.find_element_by_id(element_id))
+    expect(element.first_selected_option.text).to_equal(text)
 
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
@@ -111,13 +111,13 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
-         expected_conditions.text_to_be_present_in_element(
-             (By.ID, 'search_results'),
-             name
-         )
-     )
-     expect(found).to_be(True)
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'search_results'),
+            name
+        )
+    )
+    expect(found).to_be(True)
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):

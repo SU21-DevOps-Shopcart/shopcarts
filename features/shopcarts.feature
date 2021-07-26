@@ -37,6 +37,7 @@ Scenario: Create a Shopcart
     And I should see "1" in the "Quantity" field
     And I should see "1" in the "Price" field
 
+
 Scenario: List all Items in one shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
@@ -47,6 +48,24 @@ Scenario: List all Items in one shopcart
     And I should see "3" in the results
     And I should not see "5678" in the results
 
+Scenario: Delete a product in shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    Then I should see "1" in the results
+    And I should see "2" in the results
+    And I should see "3" in the results
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    When I press the "Delete" button
+    Then I should see the message "Item has been Deleted!"
+    When I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1" 
+    And I press the "Retrieve" button
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
+    
 Scenario: Update one item in a Shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
