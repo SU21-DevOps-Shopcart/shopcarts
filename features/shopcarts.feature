@@ -114,20 +114,20 @@ Scenario: Read shopcarts for a product_id and customer_id
     And I set the "Product_ID" to "4"
     And I press the "Search" button
     Then I should see the message "Success"
-    Then I should not see "1234" in the "Customer_ID" field
-    And I should not see "4" in the "Product_ID" field
+    Then the "Quantity" field should be empty
+    And the "Price" field should be empty
     When I press the "Clear" button
     And I set the "Customer_ID" to "6789"
     And I set the "Product_ID" to "1"
     And I press the "Search" button
     Then I should see the message "Success"
-    Then I should not see "6789" in the "Customer_ID" field
-    And I should not see "1" in the "Product_ID" field
+    Then the "Quantity" field should be empty
+    And the "Price" field should be empty
     When I press the "Clear" button
     And I set the "Customer_ID" to "6789"
     And I set the "Product_ID" to "4"
     And I press the "Search" button
     Then I should see the message "Success"
-    Then I should not see "6789" in the "Customer_ID" field
-    And I should not see "4" in the "Product_ID" field
+    Then the "Quantity" field should be empty
+    And the "Price" field should be empty
 
