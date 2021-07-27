@@ -59,7 +59,8 @@ Scenario: Checkout all items in one shopcart
     And I set the "Customer_ID" to "1234"
     And I press the "Checkout" button
     Then I should see the message "Item have been checkout!"
-    When I set the "Product_ID" to "1"
+    When I press the "Clear" button 
+    And I set the "Product_ID" to "1"
     And I set the "Customer_ID" to "1234"
     And I press the "Retrieve" button
     Then I should see "1" in the "Checkout" dropdown

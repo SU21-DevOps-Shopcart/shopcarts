@@ -128,7 +128,6 @@ $(function () {
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
       });
-
       ajax.fail(function (res) {
         clear_form_data();
         flash_message(res.responseJSON.message);
@@ -303,7 +302,6 @@ $(function () {
       contentType: "application/json",
       data: JSON.stringify(data),
     });
-
     ajax.done(function (res) {
       update_form_data(res);
       flash_message("Item have been checkout!");
