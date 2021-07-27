@@ -200,9 +200,9 @@ $(function () {
 
     if (product_id) {
       if (queryString.length > 0) {
-        product_id += "&product_id=" + product_id;
+        queryString += "&product_id=" + product_id;
       } else {
-        product_id += "product_id=" + product_id;
+        queryString += "product_id=" + product_id;
       }
     }
 
