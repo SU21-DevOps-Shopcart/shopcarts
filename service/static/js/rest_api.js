@@ -5,10 +5,17 @@ $(function () {
 
   // Updates the form with data from the response
   function update_form_data(res) {
+    
     $("#shopcart_customer_id").val(res.shopcart_id);
     $("#shopcart_product_id").val(res.product_id);
     $("#shopcart_quantity").val(res.quantity);
     $("#shopcart_price").val(res.price);
+  
+    if (res.checkout == 1){
+      $("#shopcart_checkout").val(1);
+    } else {
+      $("#shopcart_checkout").val(0);
+    }
   }
 
   /// Clears all form fields
@@ -116,7 +123,7 @@ $(function () {
       });
 
       ajax.done(function (res) {
-        //alert(res.toSource())
+        //alert (JSON.stringify(res))
         update_form_data(res);
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
@@ -271,23 +278,35 @@ $(function () {
     var quantity = $("#shopcart_quantity").val();
     var price = $("#shopcart_price").val();
 
+
+    var queryString = "";
+
     var data = {
       product_id: product_id,
       quantity: parseInt(quantity),
       price: price,
       time_added: new Date(),
     };
+    if (shopcart_id){
+      queryString+= "/shopcarts/" + shopcart_id;
+    }
+
+    if(product_id){
+      queryString+= "/items/" + product_id;
+    }
+
+    queryString+= "/checkout"
 
     var ajax = $.ajax({
       type: "PUT",
-      url: `/shopcarts/${shopcart_id}/items/${product_id}/checkout`,
+      url: queryString,
       contentType: "application/json",
       data: JSON.stringify(data),
     });
 
     ajax.done(function (res) {
       update_form_data(res);
-      flash_message("Success");
+      flash_message("Item have been checkout!");
       $("#flash_message").attr("class", "text-success");
     });
 
