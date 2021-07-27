@@ -16,6 +16,8 @@ Scenario: The server is running
     Then I should see "Shopcarts RESTful Service" in the title
     And I should not see "404 Not Found"
 
+
+
 Scenario: Create a Shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
@@ -36,7 +38,37 @@ Scenario: Create a Shopcart
     And I should see "12" in the "Product_ID" field
     And I should see "1" in the "Quantity" field
     And I should see "1" in the "Price" field
-
+    
+Scenario: Checkout all items in one shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1"
+    And I press the "Retrieve" button
+    Then I should see "0" in the "Checkout" dropdown
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "2"
+    And I press the "Retrieve" button
+    Then I should see "0" in the "Checkout" dropdown
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "3"
+    And I press the "Retrieve" button
+    Then I should see "0" in the "Checkout" dropdown
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I press the "Checkout" button
+    Then I should see the message "Item have been checkout!"
+    When I set the "Product_ID" to "1"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Retrieve" button
+    Then I should see "1" in the "Checkout" dropdown
+    When I change "Product_ID" to "2"
+    And I press the "Retrieve" button
+    Then I should see "1" in the "Checkout" dropdown
+    When I change "Product_ID" to "3"
+    And I press the "Retrieve" button
+    Then I should see "1" in the "Checkout" dropdown
 
 Scenario: List all Items in one shopcart
     When I visit the "Home Page"
@@ -104,36 +136,7 @@ Scenario: Checkout an item in one shopcart
     Then I should see "1" in the "Checkout" dropdown
 
 
-Scenario: Checkout all items in one shopcart
-    When I visit the "Home Page"
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
-    Then I should see "0" in the "Checkout" dropdown
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "2"
-    And I press the "Retrieve" button
-    Then I should see "0" in the "Checkout" dropdown
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "3"
-    And I press the "Retrieve" button
-    Then I should see "0" in the "Checkout" dropdown
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I press the "Checkout" button
-    Then I should see the message "Item have been checkout!"
-    When I set the "Product_ID" to "1"
-    And I set the "Customer_ID" to "1234"
-    And I press the "Retrieve" button
-    Then I should see "1" in the "Checkout" dropdown
-    When I change "Product_ID" to "2"
-    And I press the "Retrieve" button
-    Then I should see "1" in the "Checkout" dropdown
-    When I change "Product_ID" to "3"
-    And I press the "Retrieve" button
-    Then I should see "1" in the "Checkout" dropdown
+
 
 
 Scenario: Query shopcarts for a product_id
