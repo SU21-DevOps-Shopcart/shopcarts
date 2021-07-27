@@ -89,7 +89,7 @@ Scenario: Update one item in a Shopcart
     And I press the "Retrieve" button
     Then I should see "2" in the "Quantity" field
 
-Scenario: Checkout a item in one shopcart
+Scenario: Checkout an item in one shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
@@ -139,4 +139,15 @@ Scenario: Checkout all items in one shopcart
     And I set the "Product_ID" to "3"
     And I press the "Retrieve" button
     Then I should see "1" in the "Checkout" dropdown
+
+
+Scenario: Query shopcarts for a product_id
+    When I visit the "Home Page"
+    And I set the "Product_ID" to "4"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "5678" in the results
+    And I should see "4" in the results
+    And I should see "1" in the results
+    And I should see "50" in the results
 
