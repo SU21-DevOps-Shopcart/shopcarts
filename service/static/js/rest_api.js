@@ -10,7 +10,6 @@ $(function () {
     $("#shopcart_product_id").val(res.product_id);
     $("#shopcart_quantity").val(res.quantity);
     $("#shopcart_price").val(res.price);
-  
     if (res.checkout == 1){
       $("#shopcart_checkout").val(1);
     } else {
