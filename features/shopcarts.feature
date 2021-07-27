@@ -151,3 +151,27 @@ Scenario: Query shopcarts for a product_id
     And I should see "1" in the results
     And I should see "50" in the results
 
+
+Scenario: Read shopcarts for a product_id and customer_id
+    When I visit the "Home Page"
+    And I set the "Product_ID" to "1"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    AND I should see "1234" in the "Customer_ID" field
+    And I should see "1" in the "Product_ID" field
+    And I should see "1" in the "Quantity" field
+    And I should see "0.99" in the "Price" field
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "1"
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '1' was not found."
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "13"
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '13' was not found."
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "13"
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '13' was not found."
+
