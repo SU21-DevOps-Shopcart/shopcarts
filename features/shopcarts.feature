@@ -178,8 +178,6 @@ Scenario: Read shopcarts for a product_id and customer_id
     And the "Price" field should be empty
     When I press the "Clear" button
     And I set the "Customer_ID" to "6789"
-    And I set the "Product_ID" to "13"
-    Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '13' was not found."
     And I set the "Product_ID" to "4"
     And I press the "Search" button
     Then I should see the message "Success"
