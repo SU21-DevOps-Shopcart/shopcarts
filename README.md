@@ -56,6 +56,54 @@ vagrant ssh
 cd /vagrant
 ```
 
+## Manually running the Tests
+
+This repository has both unit tests and integration tests. You can now run `nosetests` and `behave` to run the TDD and BDD tests respectively.
+
+### Test Driven Development (TDD)
+
+This repo also has unit tests that you can run `nose`
+
+```sh
+nosetests
+```
+
+Nose is configured to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
+
+### Behavior Driven Development (BDD)
+
+These tests require the service to be running becasue unlike the the TDD unit tests that test the code locally, these BDD intagration tests are using Selenium to manipulate a web page on a running server.
+
+Run the tests using `behave`
+
+```sh
+honcho start &
+behave
+```
+
+Note that the `&` runs the server in the background. To stop the server, you must bring it to the foreground and then press `Ctrl+C`
+
+Stop the server with
+
+```sh
+fg
+<Ctrl+C>
+```
+
+Alternately you can run the server in another `shell` by opening another terminal window and using `vagrant ssh` to establish a second connection to the VM. You can also suppress all log output in the current shell with this command:
+
+```bash
+honcho start 2>&1 > /dev/null &
+```
+
+or you can supress info logging with this command:
+
+```bash
+gunicorn --bind 0.0.0.0 --log-level=error service:app &
+```
+
+This will suppress the normal `INFO` logging
+
 ## Running
 
 1. Running up project
