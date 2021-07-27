@@ -109,3 +109,28 @@ Scenario: Read shopcarts for a product_id and customer_id
     And I should see "1" in the "Product_ID" field
     And I should see "1" in the "Quantity" field
     And I should see "0.99" in the "Price" field
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "4"
+    Then I should see the message "Success"
+    Then the "Customer_ID" field should be empty
+    And the "Product_ID" field should be empty
+    And the "Quantity" field should be empty
+    And the "Price" field should be empty
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "1"
+    Then I should see the message "Success"
+    Then the "Customer_ID" field should be empty
+    And the "Product_ID" field should be empty
+    And the "Quantity" field should be empty
+    And the "Price" field should be empty
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "4"
+    Then I should see the message "Success"
+    Then the "Customer_ID" field should be empty
+    And the "Product_ID" field should be empty
+    And the "Quantity" field should be empty
+    And the "Price" field should be empty
+
