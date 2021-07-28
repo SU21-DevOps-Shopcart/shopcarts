@@ -10,7 +10,6 @@ $(function () {
     $("#shopcart_product_id").val(res.product_id);
     $("#shopcart_quantity").val(res.quantity);
     $("#shopcart_price").val(res.price);
-  
     if (res.checkout == 1){
       $("#shopcart_checkout").val(1);
     } else {
@@ -24,6 +23,7 @@ $(function () {
     $("#shopcart_product_id").val("");
     $("#shopcart_quantity").val("");
     $("#shopcart_price").val("");
+    $("#shopcart_checkout").val("");
   }
 
   // Updates the flash message area
@@ -128,7 +128,6 @@ $(function () {
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
       });
-
       ajax.fail(function (res) {
         clear_form_data();
         flash_message(res.responseJSON.message);
@@ -172,6 +171,7 @@ $(function () {
 
   $("#clear-btn").click(function () {
     $("#shopcart_customer_id").val("");
+    $("#shopcart_checkout").val("");
     flash_message("");
     $("#search_results").empty();
     var header = `
@@ -303,7 +303,6 @@ $(function () {
       contentType: "application/json",
       data: JSON.stringify(data),
     });
-
     ajax.done(function (res) {
       update_form_data(res);
       flash_message("Item have been checkout!");
