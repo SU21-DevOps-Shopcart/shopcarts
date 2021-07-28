@@ -23,6 +23,7 @@ $(function () {
     $("#shopcart_product_id").val("");
     $("#shopcart_quantity").val("");
     $("#shopcart_price").val("");
+    $("#shopcart_checkout").val("");
   }
 
   // Updates the flash message area
@@ -170,6 +171,7 @@ $(function () {
 
   $("#clear-btn").click(function () {
     $("#shopcart_customer_id").val("");
+    $("#shopcart_checkout").val("");
     flash_message("");
     $("#search_results").empty();
     var header = `
