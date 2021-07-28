@@ -51,9 +51,24 @@ In **shopcart** folder(make sure current path is /shopcart) type following instr
 ```bash
 vagrant up
 
-vagrant ssh
+```
 
-cd /vagrant
+This will bring up the development virtual machine(VM). Next we will ssh into the VM and perform a one time setup task of copying the ```dot-env-example``` file to a aspecial file called ```.env``` which will contain the environment varaibles for out 12-factor appplication:
+
+
+```vagrant ssh
+   cd /vagrant
+   cp dot-env-example .env
+   ```
+   
+You only need to do the copy once. This will establish the following environment variables:
+
+```
+PORT=8080
+FLASK_APP=service:app
+WAIT_SECONDS=60
+CLOUDANT_USERNAME=admin
+CLOUDANT_PASSWORD=pass
 ```
 
 ## Running
