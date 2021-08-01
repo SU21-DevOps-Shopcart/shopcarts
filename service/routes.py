@@ -14,7 +14,7 @@ import os
 import sys
 import logging
 from flask import Flask, json, jsonify, request, url_for, make_response, abort
-from flask_api import status  # HTTP Status Codes
+from flask_restx import Api, Resource, fields, reqparse, inputs
 from . import status # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
@@ -34,17 +34,43 @@ from . import app
 def index():
     """ Root URL response """
     app.logger.info("Request for root URL")
-    # return (
-    #     jsonify(
-    #         name="Shopcarts REST API Service",
-    #         version="1.0",
-    #         #paths=url_for("list_items", _external=True)
-    #     ),
-    #     status.HTTP_200_OK,
-    # )
-    
     ## Return html instead of json
     return app.send_static_file("index.html")
+
+
+######################################################################
+# Configure Swagger before initializing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Shopcarts Demo REST API Service',
+          description='This is a sample shopcarts service.',
+          default='shopcarts',
+          default_label='Shopcarts operations',
+          doc='/apidocs', # default also could use doc='/apidocs/'
+          prefix='/api'
+         )
+
+shopcart_model = api.model('Shopcart', {
+    'shopcart_id': fields.String(require=True,
+                                description='The customer record id'),
+    'product_id': fields.String(require=True,
+                                description='The product id of the item'),
+    'quantity': fields.Integer(require=True,
+                                description='The number of items in a shopcart'),
+    'price': fields.Float(require=True,
+                                description='The price of an item in a shopcart'),
+    'time_added': fields.DateTime(require=True,
+                                description='Time in which an item was added to a shopcart'),
+    'checkout': fields.Integer(require=True,
+                                description='if one item checked out, if zero item is not checked out')
+})
+
+
+# query string arguments
+shopcart_args = reqparse.RequestParser()
+shopcart_args.add_argument('shopcart_id', type=str, required=True, help='List all Shopcarts')
+shopcart_args.add_argument('product_id', type=str, required=True, help='List all Shopcarts with this product_id')
 
 
 #####################################################################
