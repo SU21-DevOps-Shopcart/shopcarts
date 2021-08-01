@@ -21,8 +21,14 @@ import os
 import json
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from retry import retry
+from requests import HTTPError, ConnectionError
 from datetime import datetime
 
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
@@ -34,10 +40,13 @@ def init_db(app):
     """Initialies the SQLAlchemy app"""
     Shopcart.init_db(app)
 
+
+class DatabaseConnectionError(Exception):
+    """Custom Exception when database connection fails"""
+
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-
-    pass
 
 
 class Shopcart(db.Model):
@@ -59,15 +68,32 @@ class Shopcart(db.Model):
     def __repr__(self):
         return "Shopcart shopcart_id=[%d]>" % (self.shopcart_id)
 
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def create(self):
         """
         Creates a Shopcart item in the database
         """
         logger.info("Creating shopcart item %d %d", self.shopcart_id, self.product_id)
-        # self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except HTTPError as err:
+            Shopcart.logger.warning("Create failed: %s", err)
+            return
 
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def update(self):
         """
         Updates a Shopcart item in the database
@@ -75,11 +101,19 @@ class Shopcart(db.Model):
         logger.info("Saving %d %d", self.shopcart_id, self.product_id)
         db.session.commit()
 
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def delete(self):
         """ Removes a Shopcart item from the database """
         logger.info("Deleting %d %d", self.shopcart_id, self.product_id)
         db.session.delete(self)
         db.session.commit()
+
 
     def serialize(self):
         """ Serializes a Shopcart item into a dictionary """
@@ -91,6 +125,7 @@ class Shopcart(db.Model):
             "time_added": self.time_added,
             "checkout": self.checkout
             }
+
 
     def deserialize(self, data):
         """
@@ -121,30 +156,62 @@ class Shopcart(db.Model):
         """ Initializes the database session """
         logger.info("Initializing database")
         cls.app = app
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
-        db.create_all()  # make our sqlalchemy tables
+        try:
+            # This is where we initialize SQLAlchemy from the Flask app
+            db.init_app(app)
+            app.app_context().push()
+            db.create_all()  # make our sqlalchemy tables
+        except ConnectionError:
+            raise DatabaseConnectionError("Database service could not be reached")
+            
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def all(cls):
         """ Returns all of the Shopcarts in the database """
         logger.info("Processing all Shopcarts")
         return cls.query.all()
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find(cls, shopcart_id, product_id):
         """ Finds a Shopcart item by it's shopcart_id and product_id """
         logger.info("Processing lookup for shopcart_id %d and product_id %d ...", shopcart_id, product_id)
         return cls.query.get((shopcart_id, product_id))
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_or_404(cls, shopcart_id, product_id):
         """ Find a Shopcart item by it's shopcart_id and product_id """
         logger.info("Processing lookup or 404 for shopcart_id %d and product_id %d ...", shopcart_id, product_id)
         return cls.query.get_or_404((shopcart_id, product_id))
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_shopcart_id(cls, shopcart_id):
         """ 
             Returns all Shopcart items with the given shopcart_id 
@@ -155,6 +222,13 @@ class Shopcart(db.Model):
         return cls.query.filter(cls.shopcart_id == shopcart_id).all()
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_product_id(cls, product_id):
         """ 
             Returns all shopcarts that contain item by product_id 
@@ -164,13 +238,4 @@ class Shopcart(db.Model):
         logger.info("Processing lookup for product_id %d ...", product_id)
         return cls.query.filter(cls.product_id == product_id)
 
-    # @classmethod
-    # def find_by_name(cls, name):
-    #     """Returns all YourResourceModels with the given name
-
-    #     Args:
-    #         name (string): the name of the YourResourceModels you want to match
-    #     """
-    #     logger.info("Processing name query for %s ...", name)
-    #     return cls.query.filter(cls.name == name)
 
