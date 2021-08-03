@@ -21,7 +21,7 @@ from werkzeug.exceptions import NotFound
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Shopcart, DataValidationError
+from service.models import Shopcart, DataValidationError, DatabaseConnectionError
 
 # Import Flask application
 from . import app
@@ -72,7 +72,7 @@ shopcart_args = reqparse.RequestParser()
 shopcart_args.add_argument('shopcart_id', type=str, required=True, help='List all Shopcarts')
 shopcart_args.add_argument('product_id', type=str, required=True, help='List all Shopcarts with this product_id')
 
-
+    
 #####################################################################
 # LIST ALL ITEMS
 #####################################################################
