@@ -10,6 +10,7 @@ PUT /shopcarts/{id}/items/{id} - updates a Shopcart record in the database
 DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
 """
 
+from datetime import datetime
 import os
 import sys
 import logging
@@ -52,15 +53,15 @@ api = Api(app,
          )
 
 shopcart_model = api.model('Shopcart', {
-    'shopcart_id': fields.String(require=True,
+    'shopcart_id': fields.Integer(require=True,
                                 description='The customer record id'),
-    'product_id': fields.String(require=True,
+    'product_id': fields.Integer(require=True,
                                 description='The product id of the item'),
     'quantity': fields.Integer(require=True,
                                 description='The number of items in a shopcart'),
     'price': fields.Float(require=True,
                                 description='The price of an item in a shopcart'),
-    'time_added': fields.DateTime(require=True,
+    'time_added': fields.String(require=True,
                                 description='Time in which an item was added to a shopcart'),
     'checkout': fields.Integer(require=True,
                                 description='if one item checked out, if zero item is not checked out')
@@ -72,45 +73,127 @@ shopcart_args = reqparse.RequestParser()
 shopcart_args.add_argument('shopcart_id', type=str, required=True, help='List all Shopcarts')
 shopcart_args.add_argument('product_id', type=str, required=True, help='List all Shopcarts with this product_id')
 
-    
-#####################################################################
-# LIST ALL ITEMS
-#####################################################################
-@app.route("/shopcarts", methods=["GET"])
-def list_items():
-    """ Return all of the Shopcarts """
-    app.logger.info("Request for Shopcarts list")
-    shopcarts = []
-    results = []
-    shopcart_param = request.args.get("shopcart_id")
-    product_param = request.args.get("product_id")
-    shopcart_id = (int(shopcart_param)) if shopcart_param else None
-    product_id = (int(product_param)) if product_param else None
-    if shopcart_id and product_id:
-        shopcarts = Shopcart.find(shopcart_id, product_id)
-    elif not shopcart_id and product_id:
-        shopcarts = Shopcart.find_by_product_id(product_id)
-    elif shopcart_id and not product_id:
-        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-    else:
-        shopcarts = Shopcart.all()
+######################################################################
+#  PATH: /shopcarts
+######################################################################
+@api.route('/shopcarts', strict_slashes=False)
+class ShopcartCollection(Resource):
+    """
+    ShopcartCollection class
+    Allows the introspection of a customer's shopcart
+    GET /shopcarts - Returns all shopcarts in the db
+    """
 
-    if not shopcarts:
+    #------------------------------------------------------------------
+    # LIST ALL ITEMS
+    #------------------------------------------------------------------
+    @api.doc('list_shopcarts')
+    @api.expect(shopcart_args, validate=True)
+    @api.marshal_list_with(shopcart_model)
+    def get(self):
+        """ Return all of the Shopcarts """
+        app.logger.info("Request for Shopcarts list")
+        shopcarts = []
+        results = []
+        args = shopcart_args.parse_args()
+        shopcart_id = args['shopcart_id'] if args['shopcart_id'] else None
+        product_id = args['product_id'] if args['product_id'] else None
+        if shopcart_id and product_id:
+            app.logger.info('Returning item with shopcart id %s and product id %s', args['shopcart_id'], args['product_id'])
+            shopcarts = Shopcart.find(shopcart_id, product_id)
+        elif not shopcart_id and product_id:
+            app.logger.info('Returning all shopcarts with product id: %s', args['product_id'])
+            shopcarts = Shopcart.find_by_product_id(product_id)
+        elif shopcart_id and not product_id:
+            app.logger.info('Returning all items with shopcart id: %s', args['shopcart_id'])
+            shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+        else:
+            app.logger.info('Returning unfiltered list of all shopcarts')
+            shopcarts = Shopcart.all()
+
+        if not shopcarts:
             app.logger.info("Returning 0 items")
             message = []
-            return make_response(
-                jsonify(message),
-                status.HTTP_200_OK
-            )
-    if shopcart_id and product_id:
-        results = [shopcarts.serialize()]
-    else:
-        results = [shopcart.serialize() for shopcart in shopcarts]
-    app.logger.info("Returning %d items", len(results))
-    return make_response(
-        jsonify(results),
-        status.HTTP_200_OK
-    )
+            return message, status.HTTP_200_OK
+                
+        if shopcart_id and product_id:
+            results = [shopcarts.serialize()]
+        else:
+            results = [shopcart.serialize() for shopcart in shopcarts]
+        app.logger.info("Returning %d items", len(results))
+        return results, status.HTTP_200_OK        
+
+
+######################################################################
+#  PATH: /shopcarts/{shopcart_id}
+######################################################################
+@api.route('/shopcarts/<shopcart_id>')
+@api.param('shopcart_id', 'The Shopcart identifier')
+class ShopcartResource(Resource):
+    """
+    ShopcartResource class
+    Allows the operations on a customer's shopcart
+    GET /shopcarts/{shopcart_id} - Retrieves items from a customer's shopcart
+    POST /shopcarts/{shopcart_id} - Adds a new item to a customer's shopcart
+    DELETE /shopcarts/{shopcart_id} - Removes all items from a customer's shopcart
+    """
+
+    #------------------------------------------------------------------
+    # ADD A NEW SHOPCART ITEM
+    #------------------------------------------------------------------
+    @api.doc('create_shopcarts')
+    @api.response(400, 'The posted data was not vaild')
+    @api.expect(shopcart_model)
+    @api.marshal_with(shopcart_model, code=201)
+    def post(self, shopcart_id):
+        """
+        Creates a new Shopcart item
+        This endpoint will create a Shopcart item based on the data in the body that is posted
+        """
+        app.logger.info("Request to create a Shopcart item")
+        check_content_type("application/json")
+        shopcart = Shopcart()
+        app.logger.debug('Payload = %s', api.payload)
+        app.logger.info(api.payload)
+        api.payload["shopcart_id"] = int(shopcart_id)
+        api.payload["time_added"] = datetime.strptime(api.payload["time_added"], "%a, %d %b %Y %H:%M:%S %Z")
+        shopcart.deserialize(api.payload)
+        item = Shopcart.find(api.payload["shopcart_id"], api.payload["product_id"])
+        if not item:
+            shopcart.create()
+            app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created")
+            location_url = api.url_for(ShopcartResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+            return shopcart.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+        else:
+            app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d already created", shopcart.shopcart_id, shopcart.product_id)
+            location_url = api.url_for(ShopcartResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+            return "item already exists", status.HTTP_409_CONFLICT, {"Location": location_url}
+        
+        
+
+    #------------------------------------------------------------------
+    # READ ITEMS FROM A CUSTOMER'S SHOPCART
+    #------------------------------------------------------------------
+    @api.doc('get_shopcarts')
+    @api.response(404, 'Shopcart not found')
+    @api.marshal_with(shopcart_model)
+    def get(self, shopcart_id):
+        """ Read items from a customer's Shopcart """
+        app.logger.info("Request an item from the Shopcart")
+        shopcarts = Shopcart.find_by_shopcart_id(int(shopcart_id))
+        if not shopcarts:
+            app.logger.info("Returning 0 items")
+            return [], status.HTTP_404_NOT_FOUND
+
+        results = [items.serialize() for items in shopcarts]
+        app.logger.info("Returning %d items", len(results))
+        return results, status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # CLEAR SHOPCART
+    #------------------------------------------------------------------
+
+
 
 
 ######################################################################
@@ -292,42 +375,6 @@ def get_item(shopcart_id, product_id):
     app.logger.info("Returning Shopcart item with shopcart_id: %d and product_id: %d", shopcart.shopcart_id, shopcart.product_id)
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
-
-######################################################################
-#  ADD A NEW SHOPCART ITEM
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>", methods=["POST"])
-def create_item(shopcart_id):
-    """
-    Creates a new Shopcart item
-    This endpoint will create a Shopcart item based on the data in the body that is posted
-    """
-    app.logger.info("Request to create a Shopcart item")
-    check_content_type("application/json")
-    shopcart = Shopcart()
-    data = request.get_json()
-    data["shopcart_id"] = shopcart_id
-
-    shopcart.deserialize(data)
-    item = Shopcart.find(shopcart_id, data["product_id"])
-    if not item:
-        shopcart.create()
-        message = shopcart.serialize()
-        location_url = url_for("get_item", shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
-
-        app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created")
-        return make_response(
-            jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-        )
-    else:
-        # message = shopcart.serialize()
-        message = "item already exists"
-        location_url = url_for("get_item", shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
-
-        app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d already created", shopcart.shopcart_id, shopcart.product_id)
-        return make_response(
-            jsonify(message), status.HTTP_409_CONFLICT, {"Location": location_url}
-        )
 
 
 ######################################################################
