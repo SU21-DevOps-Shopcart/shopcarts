@@ -146,10 +146,19 @@ $(function () {
   $("#delete-btn").click(function () {
     var shopcart_id = $("#shopcart_customer_id").val();
     var product_id = $("#shopcart_product_id").val();
+    var queryString = "";
 
+    if(shopcart_id){
+      queryString+=shopcart_id;
+    }
+    if(product_id){
+      queryString+="/items/"+product_id
+    }
+
+    //alert(queryString)
     var ajax = $.ajax({
       type: "DELETE",
-      url: `/shopcarts/${shopcart_id}/items/${product_id}`,
+      url: `/shopcarts/`+queryString,
       contentType: "application/json",
     });
 

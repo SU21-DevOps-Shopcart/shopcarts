@@ -137,9 +137,6 @@ Scenario: Checkout an item in one shopcart
     Then I should see "1" in the "Checkout" field
 
 
-
-
-
 Scenario: Query shopcarts for a product_id
     When I visit the "Home Page"
     And I set the "Product_ID" to "4"
@@ -173,3 +170,12 @@ Scenario: Read shopcarts for a product_id and customer_id
     And I press the "Retrieve" button
     Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '4' was not found."
 
+Scenario: Delete all items in one shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Search" button
+    Then I should see "1234" in the results
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I press the "Delete" button
+    Then I should not see "1234" in the results
