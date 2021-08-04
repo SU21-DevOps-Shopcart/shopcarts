@@ -20,10 +20,13 @@ checkout (integer) - checkout status
 import os
 import json
 import logging
+
+import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 from retry import retry
 from requests import HTTPError, ConnectionError
 from datetime import datetime
+from psycopg2 import OperationalError
 
 # global variables for retry (must be int)
 RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
@@ -69,7 +72,7 @@ class Shopcart(db.Model):
         return "Shopcart shopcart_id=[%d]>" % (self.shopcart_id)
 
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -83,12 +86,12 @@ class Shopcart(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-        except HTTPError as err:
+        except OperationalError as err:
             Shopcart.logger.warning("Create failed: %s", err)
             return
 
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -102,7 +105,7 @@ class Shopcart(db.Model):
         db.session.commit()
 
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -167,7 +170,7 @@ class Shopcart(db.Model):
 
     @classmethod
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -180,7 +183,7 @@ class Shopcart(db.Model):
 
     @classmethod
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -193,7 +196,7 @@ class Shopcart(db.Model):
 
     @classmethod
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -206,7 +209,7 @@ class Shopcart(db.Model):
 
     @classmethod
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,
@@ -223,7 +226,7 @@ class Shopcart(db.Model):
 
     @classmethod
     @retry(
-        HTTPError,
+        OperationalError,
         delay=RETRY_DELAY,
         backoff=RETRY_BACKOFF,
         tries=RETRY_COUNT,

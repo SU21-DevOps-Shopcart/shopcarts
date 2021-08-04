@@ -17,6 +17,7 @@ from flask import Flask, json, jsonify, request, url_for, make_response, abort
 from flask_restx import Api, Resource, fields, reqparse, inputs
 from . import status # HTTP Status Codes
 from werkzeug.exceptions import NotFound
+from psycopg2 import OperationalError
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
