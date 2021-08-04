@@ -114,7 +114,6 @@ $(function () {
     var shopcart_id = $("#shopcart_customer_id").val();
     var product_id = $("#shopcart_product_id").val();
     var queryString = "";
-    alert(queryString);
     if(shopcart_id){
         queryString+= "/shopcarts?"+"shopcart_id="+shopcart_id;
     }
@@ -132,7 +131,6 @@ $(function () {
     });
 
 
-    alert("retrieve");
     if(product_id){
       ajax.done(function (res) {
           //alert (JSON.stringify(res))
