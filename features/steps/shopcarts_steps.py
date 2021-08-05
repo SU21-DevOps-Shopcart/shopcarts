@@ -27,27 +27,33 @@ import requests
 from behave import given
 from compare import expect
 from datetime import datetime
+import logging
 
 @given('the following shopcart_items')
 def step_impl(context):
     """ Delete all Shopcart items and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the shopcart items and delete them one by one
-    context.resp = requests.get(context.base_url + '/shopcarts', headers=headers)
-    #print(context.resp.status_code)
+    context.resp = requests.get(context.base_url + '/api/shopcarts')
+    # logging.info(context.resp)
     expect(context.resp.status_code).to_equal(200)
     for item in context.resp.json():
+
+        ######################################################################
+        # change the path from '/shopcarts' to '/api/shopcarts'
+        ######################################################################
+
         context.resp = requests.delete(context.base_url + '/shopcarts/' + str(item["shopcart_id"]) + '/items/' + str(item["product_id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
     # load the database with new items
     for row in context.table:
-        create_url = context.base_url + '/shopcarts/' + row["shopcart_id"]
+        create_url = context.base_url + '/api/shopcarts/' + row["shopcart_id"]
         data = {
             'product_id': row['product_id'],
             'quantity': row['quantity'],
             'price': row['price'],
-            'time_added': str(datetime.now()),
+            'time_added': str(datetime.now().strftime("%a, %d %b %Y %H:%M:%S")),
             'checkout': 0
             }
         payload = json.dumps(data)

@@ -61,7 +61,7 @@ class Shopcart(db.Model):
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     quantity = db.Column(db.Integer, nullable=False,default=0)
     price = db.Column(db.Float, nullable=False, default=0.00)
-    time_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    time_added = db.Column(db.DateTime, nullable=False, default=datetime.now())
     # checkout status,  0: not checkout, 1: checkout 
     checkout = db.Column(db.Integer, nullable=False, default=0)
 

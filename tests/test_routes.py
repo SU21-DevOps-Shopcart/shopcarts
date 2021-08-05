@@ -56,7 +56,7 @@ class TestYourResourceServer(TestCase):
         db.drop_all()
 
     def _create_item(self):
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": 1234,
             "product_id": 5678,
@@ -76,7 +76,7 @@ class TestYourResourceServer(TestCase):
         return shopcart
 
     def _create_shopcart_with_item(self, shopcart_id, product_id):
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": shopcart_id,
             "product_id": product_id,
@@ -123,7 +123,7 @@ class TestYourResourceServer(TestCase):
 
     def test_create_item(self):
         """Test Create a new Shopcart item"""
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": 1234,
             "product_id": 5678,
@@ -163,7 +163,7 @@ class TestYourResourceServer(TestCase):
 
     def test_create_duplicate_item(self):
         """Test Create a Shopcart item that already exists"""
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": 1234,
             "product_id": 5678,
@@ -251,7 +251,7 @@ class TestYourResourceServer(TestCase):
         #update item
         new_item = resp.get_json()
         logging.debug(new_item)
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         new_item['price'] = "3.9"
         new_item['time_added'] = time_freeze
         resp = self.app.put(
@@ -271,13 +271,13 @@ class TestYourResourceServer(TestCase):
             json=new_item,
             content_type="application/json",
         )
-       # time_freeze = datetime.utcnow()
+       # time_freeze = datetime.now()
         updated_item = resp.get_json()
         self.assertEqual(updated_item['price'], 3.9)
         self.assertEqual(updated_item['quantity'], 3)
 
         #update item does not exist
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": 124,
             "product_id": 5678,
@@ -349,7 +349,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         #test change status of item does not exist
-        time_freeze = datetime.utcnow()
+        time_freeze = datetime.now()
         data = {
             "shopcart_id": 124,
             "product_id": 5678,

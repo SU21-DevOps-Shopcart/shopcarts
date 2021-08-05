@@ -61,7 +61,7 @@ shopcart_model = api.model('Shopcart', {
                                 description='The number of items in a shopcart'),
     'price': fields.Float(require=True,
                                 description='The price of an item in a shopcart'),
-    'time_added': fields.String(require=True,
+    'time_added': fields.DateTime(require=True,
                                 description='Time in which an item was added to a shopcart'),
     'checkout': fields.Integer(require=True,
                                 description='if one item checked out, if zero item is not checked out')
@@ -100,8 +100,6 @@ class ShopcartCollection(Resource):
         parser.add_argument('shopcart_id', type=int)
         parser.add_argument('product_id', type=int)
         args = parser.parse_args()
-        print(args['shopcart_id'])
-        print(args['product_id'])
         shopcart_id = args['shopcart_id'] if args['shopcart_id'] else None
         product_id = args['product_id'] if args['product_id'] else None
         if shopcart_id and product_id:
@@ -162,7 +160,7 @@ class ShopcartResource(Resource):
         app.logger.debug('Payload = %s', api.payload)
         app.logger.info(api.payload)
         api.payload["shopcart_id"] = int(shopcart_id)
-        api.payload["time_added"] = datetime.strptime(api.payload["time_added"], "%a, %d %b %Y %H:%M:%S %Z")
+        # api.payload["time_added"] = datetime.strptime(api.payload["time_added"], "%a, %d %b %Y %H:%M:%S")
         shopcart.deserialize(api.payload)
         item = Shopcart.find(api.payload["shopcart_id"], api.payload["product_id"])
         if not item:
@@ -174,8 +172,7 @@ class ShopcartResource(Resource):
             app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d already created", shopcart.shopcart_id, shopcart.product_id)
             location_url = api.url_for(ShopcartResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
             return "item already exists", status.HTTP_409_CONFLICT, {"Location": location_url}
-        
-        
+                
 
     #------------------------------------------------------------------
     # READ ITEMS FROM A CUSTOMER'S SHOPCART
