@@ -80,12 +80,9 @@ class Shopcart(db.Model):
         Creates a Shopcart item in the database
         """
         logger.info("Creating shopcart item %d %d", self.shopcart_id, self.product_id)
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except HTTPError as err:
-            Shopcart.logger.warning("Create failed: %s", err)
-            return
+        db.session.add(self)
+        db.session.commit()
+
 
     @retry(
         HTTPError,

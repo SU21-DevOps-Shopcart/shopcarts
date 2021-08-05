@@ -91,11 +91,17 @@ class ShopcartCollection(Resource):
     @api.expect(shopcart_args, validate=True)
     @api.marshal_list_with(shopcart_model)
     def get(self):
+        print('list')
         """ Return all of the Shopcarts """
         app.logger.info("Request for Shopcarts list")
         shopcarts = []
         results = []
-        args = shopcart_args.parse_args()
+        parser = reqparse.RequestParser()
+        parser.add_argument('shopcart_id', type=int)
+        parser.add_argument('product_id', type=int)
+        args = parser.parse_args()
+        print(args['shopcart_id'])
+        print(args['product_id'])
         shopcart_id = args['shopcart_id'] if args['shopcart_id'] else None
         product_id = args['product_id'] if args['product_id'] else None
         if shopcart_id and product_id:
@@ -195,31 +201,6 @@ class ShopcartResource(Resource):
 
 
 
-
-######################################################################
-# READ ITEMS FROM A CUSTOMER'S SHOPCART
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
-def list_items_in_shopcart(shopcart_id):
-    """ Read items from a customer's Shopcart """
-    app.logger.info("Request an item from the Shopcart")
-
-    shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-
-    if not shopcarts:
-            app.logger.info("Returning 0 items")
-            message = []
-            return make_response(
-                jsonify(message),
-                status.HTTP_404_NOT_FOUND
-            )
-
-    results = [items.serialize() for items in shopcarts]
-    app.logger.info("Returning %d items", len(results))
-    return make_response(
-        jsonify(results),
-        status.HTTP_200_OK
-    )
 
 
 ######################################################################

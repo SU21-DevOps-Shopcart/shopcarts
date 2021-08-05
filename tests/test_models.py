@@ -13,7 +13,7 @@ import os
 import logging
 import unittest
 from werkzeug.exceptions import NotFound
-from service.models import Shopcart, DataValidationError, db
+from service.models import Shopcart, DataValidationError, db, DatabaseConnectionError
 from service import app
 from datetime import datetime
 
