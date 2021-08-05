@@ -173,9 +173,12 @@ Scenario: Read shopcarts for a product_id and customer_id
 Scenario: Delete all items in one shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
-    And I press the "Search" button
+    And I press the "Retrieve" button
     Then I should see "1234" in the results
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I press the "Delete" button
+    Then I should see the message "Item has been Deleted!"
+    When I set the "Customer_ID" to "1234"
+    And I press the "Retrieve" button
     Then I should not see "1234" in the results
