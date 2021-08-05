@@ -165,7 +165,7 @@ class ShopcartResource(Resource):
         item = Shopcart.find(api.payload["shopcart_id"], api.payload["product_id"])
         if not item:
             shopcart.create()
-            app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created")
+            app.logger.info("Shopcart with shopcart_id [%d] and product_id [%d created", shopcart.shopcart_id, shopcart.product_id)
             location_url = api.url_for(ShopcartResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
             return shopcart.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
         else:

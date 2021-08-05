@@ -115,24 +115,23 @@ $(function () {
     var product_id = $("#shopcart_product_id").val();
     var queryString = "";
     if(shopcart_id){
-        queryString+= "/shopcarts?"+"shopcart_id="+shopcart_id;
+        queryString+="/api/shopcarts?shopcart_id="+shopcart_id;
     }
 
     if(product_id) {
-        queryString= "/shopcarts/"+shopcart_id+"/items/" + product_id;
+        queryString="/shopcarts/"+shopcart_id+"/items/"+product_id;
     }
-
 
     var ajax = $.ajax({
       type: "GET",
-      url: queryString  ,
+      url: queryString,
       contentType: "application/json",
       data: "",
     });
 
     if(product_id){
       ajax.done(function (res) {
-          //alert (JSON.stringify(res))
+        //alert (JSON.stringify(res))
         update_form_data(res);
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
