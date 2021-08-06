@@ -61,7 +61,7 @@ class Shopcart(db.Model):
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     quantity = db.Column(db.Integer, nullable=False,default=0)
     price = db.Column(db.Float, nullable=False, default=0.00)
-    time_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    time_added = db.Column(db.DateTime, nullable=False, default=datetime.now())
     # checkout status,  0: not checkout, 1: checkout 
     checkout = db.Column(db.Integer, nullable=False, default=0)
 
@@ -80,12 +80,9 @@ class Shopcart(db.Model):
         Creates a Shopcart item in the database
         """
         logger.info("Creating shopcart item %d %d", self.shopcart_id, self.product_id)
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except HTTPError as err:
-            Shopcart.logger.warning("Create failed: %s", err)
-            return
+        db.session.add(self)
+        db.session.commit()
+
 
     @retry(
         HTTPError,
