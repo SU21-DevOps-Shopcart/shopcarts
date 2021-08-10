@@ -223,20 +223,20 @@ class ShopcartItemResource(Resource):
         Updates a new Shopcart item
         This endpoint will update a Shopcart item based on the data in the body that is posted
         """
-        shopcartParams = {"shopcart_id": shopcart_id, "product_id": product_id}
-        api.payload.update(shopcartParams)
-        app.logger.info("Request to update item in shopcart: %s with id: %s", api.payload["shopcart_id"], api.payload["product_id"])
-        check_content_type("application/json")
-
+        shopcart_id = int(shopcart_id)
+        product_id = int(product_id)
         shopcart = Shopcart.find(shopcart_id, product_id)
+
+        app.logger.info("Request to update item in shopcart: %s with id: %s", api.payload["shopcart_id"], api.payload["product_id"])
+        check_content_type("application/json")        
 
         if not shopcart:
             app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d not found", shopcart_id, product_id)
-            location_url = api.url_for(ShopcartItemResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
-            return "item with shopcart id '{}' and item id '{}' was not found.".format(api.payload["shopcart_id"], api.payload["product_id"]), status.HTTP_404_NOT_FOUND, {"Location": location_url}
+            return "item with shopcart id '{}' and item id '{}' was not found.".format(api.payload["shopcart_id"], api.payload["product_id"]), status.HTTP_404_NOT_FOUND
         
         else:
-           
+            shopcartParams = {"shopcart_id": shopcart_id, "product_id": product_id, "quantity": shopcart.quantity + 1}
+            api.payload.update(shopcartParams)
             shopcart.deserialize(api.payload)
             shopcart.update()
             location_url = api.url_for(ShopcartItemResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
