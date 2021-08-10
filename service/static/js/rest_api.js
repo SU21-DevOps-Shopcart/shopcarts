@@ -5,12 +5,11 @@ $(function () {
 
   // Updates the form with data from the response
   function update_form_data(res) {
-    
     $("#shopcart_customer_id").val(res.shopcart_id);
     $("#shopcart_product_id").val(res.product_id);
     $("#shopcart_quantity").val(res.quantity);
     $("#shopcart_price").val(res.price);
-    if (res.checkout == 1){
+    if (res.checkout == 1) {
       $("#shopcart_checkout").val(1);
     } else {
       $("#shopcart_checkout").val(0);
@@ -89,7 +88,7 @@ $(function () {
 
     var ajax = $.ajax({
       type: "PUT",
-      url: `/shopcarts/${shopcart_id}/items/${product_id}`,
+      url: `/api/shopcarts/${shopcart_id}/items/${product_id}`,
       contentType: "application/json",
       data: JSON.stringify(data),
     });
@@ -114,12 +113,12 @@ $(function () {
     var shopcart_id = $("#shopcart_customer_id").val();
     var product_id = $("#shopcart_product_id").val();
     var queryString = "";
-    if(shopcart_id){
-        queryString+="/api/shopcarts?shopcart_id="+shopcart_id;
+    if (shopcart_id) {
+      queryString += "/api/shopcarts?shopcart_id=" + shopcart_id;
     }
 
-    if(product_id) {
-        queryString="/shopcarts/"+shopcart_id+"/items/"+product_id;
+    if (product_id) {
+      queryString = "/shopcarts/" + shopcart_id + "/items/" + product_id;
     }
 
     var ajax = $.ajax({
@@ -129,16 +128,14 @@ $(function () {
       data: "",
     });
 
-    if(product_id){
+    if (product_id) {
       ajax.done(function (res) {
         //alert (JSON.stringify(res))
         update_form_data(res);
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
       });
-      
-    }
-    else{
+    } else {
       ajax.done(function (res) {
         //alert(res.toSource())
         $("#search_results").empty();
@@ -154,7 +151,7 @@ $(function () {
               </tr>
             </thead>
         `;
-  
+
         var firstItem = "";
         var rows = res.map((item) => {
           // copy the first result to the form
@@ -172,17 +169,16 @@ $(function () {
             ${item.checkout}
             </td></tr>`;
         });
-  
+
         var table = header.concat(...rows, "</table>");
-  
+
         $("#search_results").append(table);
-  
+
         flash_message("Success");
         $("#flash_message").attr("class", "text-success");
       });
     }
 
-     
     ajax.fail(function (res) {
       clear_form_data();
       flash_message(res.responseJSON.message);
@@ -199,17 +195,16 @@ $(function () {
     var product_id = $("#shopcart_product_id").val();
     var queryString = "";
 
-    if(shopcart_id){
-      queryString+=shopcart_id;
+    if (shopcart_id) {
+      queryString += shopcart_id;
     }
-    if(product_id){
-      queryString+="/items/"+product_id
+    if (product_id) {
+      queryString += "/items/" + product_id;
     }
 
-    
     var ajax = $.ajax({
       type: "DELETE",
-      url: `/api/shopcarts/`+queryString,
+      url: `/api/shopcarts/` + queryString,
       //contentType: "application/json",
     });
 
@@ -338,7 +333,6 @@ $(function () {
     var quantity = $("#shopcart_quantity").val();
     var price = $("#shopcart_price").val();
 
-
     var queryString = "";
 
     var data = {
@@ -347,15 +341,15 @@ $(function () {
       price: price,
       time_added: new Date(),
     };
-    if (shopcart_id){
-      queryString+= "/shopcarts/" + shopcart_id;
+    if (shopcart_id) {
+      queryString += "/shopcarts/" + shopcart_id;
     }
 
-    if(product_id){
-      queryString+= "/items/" + product_id;
+    if (product_id) {
+      queryString += "/items/" + product_id;
     }
 
-    queryString+= "/checkout"
+    queryString += "/checkout";
 
     var ajax = $.ajax({
       type: "PUT",
