@@ -139,7 +139,7 @@ class TestShopcartModel(unittest.TestCase):
         self.assertIn("price", data)
         self.assertEqual(data["price"], shopcart.price)
         self.assertIn("time_added", data)
-        self.assertEqual(data["time_added"], shopcart.time_added)
+        self.assertEqual(data["time_added"], shopcart.time_added.isoformat())
         self.assertIn("checkout", data)
         self.assertEqual(data["checkout"], shopcart.checkout)
 
