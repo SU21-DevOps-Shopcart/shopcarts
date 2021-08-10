@@ -346,7 +346,7 @@ $(function () {
     }
 
     if (product_id) {
-      queryString = "/shopcarts/" + shopcart_id + "/items/" + product_id;
+      queryString = "/api/shopcarts/" + shopcart_id + "/items/" + product_id;
     }
 
     queryString += "/checkout";

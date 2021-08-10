@@ -339,7 +339,6 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(information["checkout"], 0)
         
         #test change checkout status
-        # resp = self.app.put("/shopcarts/1234/items/5678/checkout")
         resp = self.app.put("/api/shopcarts/1234/items/5678/checkout")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
