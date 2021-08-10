@@ -331,7 +331,7 @@ class TestYourResourceServer(TestCase):
 
         #create item
         item = self._create_item()
-        resp = self.app.get("/shopcarts/1234/items/5678")
+        resp = self.app.get("/api/shopcarts/1234/items/5678")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 0)
