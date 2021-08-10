@@ -249,7 +249,7 @@ class ShopcartItems(Resource):
         product_id = int(product_id)
         shopcart = Shopcart.find(shopcart_id, product_id)
 
-        app.logger.info("Request to update item in shopcart: %s with id: %s", api.payload["shopcart_id"], api.payload["product_id"])
+        app.logger.info("Request to update item in shopcart: %s with id: %s", shopcart_id, product_id)
         check_content_type("application/json")        
 
         if not shopcart:

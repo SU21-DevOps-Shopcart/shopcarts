@@ -204,7 +204,7 @@ $(function () {
 
     var ajax = $.ajax({
       type: "DELETE",
-      url: `/shopcarts/` + queryString,
+      url: `/api/shopcarts/` + queryString,
       //contentType: "application/json",
     });
 

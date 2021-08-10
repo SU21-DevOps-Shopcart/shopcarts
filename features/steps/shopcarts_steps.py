@@ -43,7 +43,7 @@ def step_impl(context):
         # change the path from '/shopcarts' to '/api/shopcarts'
         ######################################################################
 
-        context.resp = requests.delete(context.base_url + '/shopcarts/' + str(item["shopcart_id"]) + '/items/' + str(item["product_id"]), headers=headers)
+        context.resp = requests.delete(context.base_url + '/api/shopcarts/' + str(item["shopcart_id"]) + '/items/' + str(item["product_id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
     # load the database with new items
