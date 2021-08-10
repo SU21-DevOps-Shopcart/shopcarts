@@ -33,6 +33,7 @@ RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 logger = logging.getLogger("flask.app")
 
 
+
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
@@ -156,6 +157,7 @@ class Shopcart(db.Model):
         try:
             # This is where we initialize SQLAlchemy from the Flask app
             db.init_app(app)
+            app.config['ERROR_404_HELP'] = False
             app.app_context().push()
             db.create_all()  # make our sqlalchemy tables
         except ConnectionError:
