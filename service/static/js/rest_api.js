@@ -205,7 +205,7 @@ $(function () {
     var ajax = $.ajax({
       type: "DELETE",
       url: `/api/shopcarts/` + queryString,
-      //contentType: "application/json",
+      contentType: "application/json",
     });
 
     ajax.done(function (res) {
@@ -342,11 +342,11 @@ $(function () {
       time_added: new Date(),
     };
     if (shopcart_id) {
-      queryString += "/shopcarts/" + shopcart_id;
+      queryString += "/api/shopcarts/" + shopcart_id;
     }
 
     if (product_id) {
-      queryString += "/items/" + product_id;
+      queryString = "/shopcarts/" + shopcart_id + "/items/" + product_id;
     }
 
     queryString += "/checkout";
