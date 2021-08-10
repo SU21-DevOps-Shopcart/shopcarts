@@ -255,7 +255,7 @@ class TestYourResourceServer(TestCase):
         new_item['price'] = "3.9"
         new_item['time_added'] = time_freeze
         resp = self.app.put(
-            "/shopcarts/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
+            BASE_URL + "/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
             json=new_item,
             content_type="application/json",
         )
@@ -267,7 +267,7 @@ class TestYourResourceServer(TestCase):
         # self.assertEqual(updated_item['time_added'], time_freeze)
 
         resp = self.app.put(
-            "/shopcarts/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
+            BASE_URL + "/{}/items/{}".format(new_item['shopcart_id'],new_item['product_id']),
             json=new_item,
             content_type="application/json",
         )
@@ -288,7 +288,7 @@ class TestYourResourceServer(TestCase):
         }
 
         resp = self.app.put(
-            "/shopcarts/123456/items/123",
+            BASE_URL + "/123456/items/123",
             json=data,
             content_type="application/json",
         )
@@ -320,7 +320,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.get_json()), 3)
 
-        resp = self.app.delete("/shopcarts/1234")
+        resp = self.app.delete("/api/shopcarts/1234")
 
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
