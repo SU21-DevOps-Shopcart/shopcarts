@@ -303,7 +303,7 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         #delete the item
-        resp = self.app.delete("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        resp = self.app.delete("/api/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         # make sure item not in database
         resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
