@@ -333,19 +333,20 @@ class TestYourResourceServer(TestCase):
 
         #create item
         item = self._create_item()
-        resp = self.app.get("/shopcarts/1234/items/5678")
+        resp = self.app.get("/api/shopcarts/1234/items/5678")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 0)
         
         #test change checkout status
-        resp = self.app.put("/shopcarts/1234/items/5678/checkout")
+        # resp = self.app.put("/shopcarts/1234/items/5678/checkout")
+        resp = self.app.put("/api/shopcarts/1234/items/5678/checkout")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         information = resp.get_json()
         self.assertEqual(information["checkout"], 1)
 
         #test change checkout item already checkout
-        resp = self.app.put("/shopcarts/1234/items/5678/checkout",)
+        resp = self.app.put("/api/shopcarts/1234/items/5678/checkout",)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         #test change status of item does not exist
@@ -359,7 +360,7 @@ class TestYourResourceServer(TestCase):
             "checkout" : 0
         }
 
-        resp = self.app.put("/shopcarts/12345/items/100/checkout",)
+        resp = self.app.put("/api/shopcarts/12345/items/100/checkout",)
         
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
