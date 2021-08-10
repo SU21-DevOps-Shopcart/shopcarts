@@ -340,9 +340,9 @@ class ShopcartCheckoutItems(Resource):
     """
 
     #------------------------------------------------------------------
-    # CHECKOUT ALL ITEM
+    # CHECKOUT AN EXISTING ITEM
     #------------------------------------------------------------------
-    @api.doc('checkout_one_shopcart_items')
+    @api.doc('checkout_shopcart_items')
     @api.response(404, 'Item not found')
     def put(shopcart_id, product_id):
         """
