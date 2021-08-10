@@ -207,15 +207,15 @@ class ShopcartResource(Resource):
         """
         app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
 
-        shopcart = Shopcart.find_by_shopcart_id(shopcart_id)
+        shopcart = Shopcart.find_by_shopcart_id(int(shopcart_id))
 
         results = [item.serialize() for item in shopcart]
 
         if results:
             for i in results:
-                shopcart = Shopcart.find(shopcart_id, i['product_id'])
+                shopcart = Shopcart.find(int(shopcart_id), i['product_id'])
                 shopcart.delete()
-        return '', status.HTTP_204_NOCONTENT
+        return '', status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  PATH: /shopcarts/{shopcart_id}/items/{product_id}
@@ -229,7 +229,7 @@ class ShopcartItems(Resource):
     Allows the operations on a customer's shopcart
     GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves items from a customer's shopcart
     DELETE /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
-    PUT /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
+    PUT /shopcarts/{shopcart_id}/items/{product_id} - Updates one item from a customer's shopcart
     """
 
     #------------------------------------------------------------------
@@ -252,87 +252,6 @@ class ShopcartItems(Resource):
             app.logger.info('Shopcart with id [%s] and product id [%s] was deleted', shopcart_id, product_id)
         return '', status.HTTP_204_NO_CONTENT
 
-######################################################################
-#  PATH: /shopcarts/{shopcart_id}/items/{product_id}/checkout
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>/checkout")
-@api.param('shopcart_id', 'The Shopcart identifier')
-@api.param('product_id', 'The Product identifier')
-class ShopcartItemCheckout(Resource):
-    """
-        ShopcartItemsCheckout class
-        Allows the operations on a customer's shopcart
-        PUT /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
-        """
-    # ------------------------------------------------------------------
-    # CHECKOUT AN EXISTING ITEM
-    # ------------------------------------------------------------------
-    @api.doc('checkout_item')
-    @api.response(204, 'Item checked out')
-    @api.marshal_with(shopcart_model)
-    def put(shopcart_id, product_id):
-        """
-        Checkout an item
-
-        This endpoint will update a item based the body that is posted
-        """
-        app.logger.info("Request to checkout item in shopcart: %s with id: %s", shopcart_id, product_id)
-
-        shopcart = Shopcart.find(shopcart_id, product_id)
-
-        if not shopcart:
-            raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id, product_id))
-
-        else:
-            shopcart_dict_database = shopcart.serialize()
-            app.logger.info("changing checkout status from 0 to 1")
-            shopcart_dict_database['checkout'] = str(1)
-            shopcart.deserialize(shopcart_dict_database)
-            shopcart.update()
-            return '', status.HTTP_204_NOCONTENT
-
-######################################################################
-#  PATH: /shopcarts/{shopcart_id}/checkout
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/checkout")
-@api.param('shopcart_id', 'The Shopcart identifier')
-class ShopcartCheckout(Resource):
-    """
-        ShopcartCheckout class
-        Allows the operations on a customer's shopcart
-        PUT /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
-        """
-    #------------------------------------------------------------------
-    # CHECKOUT SHOPCART
-    #------------------------------------------------------------------
-    @api.doc('checkout_shopcart')
-    @api.response(204, 'Shopcart checked out')
-    @api.marshal_with(shopcart_model)
-    def put(shopcart_id):
-        """
-        Checkout all item in shopcart
-
-        This endpoint will update a item based the body that is posted
-        """
-        app.logger.info("Request to checkout all items in shopcart: %s", shopcart_id)
-        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-
-        if not shopcarts:
-            raise NotFound("item with shopcart id '{}' was not found.".format(shopcart_id))
-
-        else:
-            results = [shopcart.serialize() for shopcart in shopcarts]
-            print(results)
-            for product in results:
-                print(product)
-                product_id = product['product_id']
-                product['checkout'] = str(1)
-                shopcart = Shopcart.find(shopcart_id, product_id)
-                shopcart.deserialize(product)
-                shopcart.update()
-            shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-            results = [shopcart.serialize() for shopcart in shopcarts]
-            return '', status.HTTP_204_NOCONTENT
 
 ######################################################################
 # UPDATE AN EXISTING ITEM
@@ -367,61 +286,61 @@ def update_item(shopcart_id,product_id):
         return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 
-######################################################################
+#####################################################################
 # CHECKOUT AN EXISTING ITEM
-######################################################################
-# @app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>/checkout", methods=["PUT"])
-# def checkout_item(shopcart_id,product_id):
-#     """
-#     Checkout an item
-#
-#     This endpoint will update a item based the body that is posted
-#     """
-#     app.logger.info("Request to checkout item in shopcart: %s with id: %s",shopcart_id, product_id)
-#
-#     shopcart = Shopcart.find(shopcart_id, product_id)
-#
-#
-#     if not shopcart:
-#         raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
-#
-#     else:
-#         shopcart_dict_database = shopcart.serialize()
-#         app.logger.info("changing checkout status from 0 to 1")
-#         shopcart_dict_database['checkout'] = str(1)
-#         shopcart.deserialize(shopcart_dict_database)
-#         shopcart.update()
-#         return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+#####################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>/checkout", methods=["PUT"])
+def checkout_item(shopcart_id,product_id):
+    """
+    Checkout an item
 
-######################################################################
+    This endpoint will update a item based the body that is posted
+    """
+    app.logger.info("Request to checkout item in shopcart: %s with id: %s",shopcart_id, product_id)
+
+    shopcart = Shopcart.find(shopcart_id, product_id)
+
+
+    if not shopcart:
+        raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
+
+    else:
+        shopcart_dict_database = shopcart.serialize()
+        app.logger.info("changing checkout status from 0 to 1")
+        shopcart_dict_database['checkout'] = str(1)
+        shopcart.deserialize(shopcart_dict_database)
+        shopcart.update()
+        return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+#####################################################################
 # CHECKOUT ALL ITEM IN SHOPCART
-######################################################################
-# @app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["PUT"])
-# def checkout_shopcarts(shopcart_id):
-#     """
-#     Checkout all item in shopcart
-#
-#     This endpoint will update a item based the body that is posted
-#     """
-#     app.logger.info("Request to checkout all items in shopcart: %s",shopcart_id)
-#     shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-#
-#     if not shopcarts:
-#         raise NotFound("item with shopcart id '{}' was not found.".format(shopcart_id))
-#
-#     else:
-#         results = [shopcart.serialize() for shopcart in shopcarts]
-#         print(results)
-#         for product in results:
-#             print(product)
-#             product_id = product['product_id']
-#             product['checkout'] = str(1)
-#             shopcart = Shopcart.find(shopcart_id, product_id)
-#             shopcart.deserialize(product)
-#             shopcart.update()
-#         shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
-#         results = [shopcart.serialize() for shopcart in shopcarts]
-#         return make_response(jsonify(results),status.HTTP_200_OK)
+#####################################################################
+@app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["PUT"])
+def checkout_shopcarts(shopcart_id):
+    """
+    Checkout all item in shopcart
+
+    This endpoint will update a item based the body that is posted
+    """
+    app.logger.info("Request to checkout all items in shopcart: %s",shopcart_id)
+    shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+
+    if not shopcarts:
+        raise NotFound("item with shopcart id '{}' was not found.".format(shopcart_id))
+
+    else:
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        print(results)
+        for product in results:
+            print(product)
+            product_id = product['product_id']
+            product['checkout'] = str(1)
+            shopcart = Shopcart.find(shopcart_id, product_id)
+            shopcart.deserialize(product)
+            shopcart.update()
+        shopcarts = Shopcart.find_by_shopcart_id(shopcart_id)
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        return make_response(jsonify(results),status.HTTP_200_OK)
 
 
 ######################################################################
