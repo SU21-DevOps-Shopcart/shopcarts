@@ -229,7 +229,7 @@ class ShopcartItems(Resource):
     ShopcartItems class
     Allows the operations on a customer's shopcart
     DELETE /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
-    GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves items from a customer's shopcart
+    GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves one item from a customer's shopcart
     PUT /shopcarts/{shopcart_id}/items/{product_id} - Updates one item from a customer's shopcart
     """
 
@@ -258,7 +258,7 @@ class ShopcartItems(Resource):
     @api.doc('get_shopcart_item')
     @api.response(404, 'Item not found')
     @api.marshal_with(shopcart_model)
-    def get_item(self ,shopcart_id, product_id):
+    def get(self ,shopcart_id, product_id):
         """
         Retrieve a item in specific shopcart
 
