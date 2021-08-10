@@ -196,41 +196,51 @@ class ShopcartResource(Resource):
     # CLEAR SHOPCART
     #------------------------------------------------------------------
 
-
-
-
-
 ######################################################################
-# UPDATE AN EXISTING ITEM
+#  PATH: /shopcarts/{shopcart_id}/product/{product_id}
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["PUT"])
-def update_item(shopcart_id,product_id):
+
+@api.route('/shopcarts/<shopcart_id>/items/<product_id>')
+@api.param('shopcart_id', 'The Shopcart identifier')
+@api.param('product_id', 'The Shopcart product identifier')
+class ShopcartItemResource(Resource):
     """
-    Update a item
-
-    when add item existing in database, will increase its quantity
-    and changed price when was added
-
-    This endpoint will update a item based the body that is posted
+    ShopcartItemResource class
+    Allows the operations on a customer's shopcart item
+    UPDATE /shopcarts/{shopcart_id}/items/{product_id} - Updates a single item from a customer's shopcart
     """
-    app.logger.info("Request to update item in shopcart: %s with id: %s",shopcart_id, product_id)
-    check_content_type("application/json")
 
-    shopcart = Shopcart.find(shopcart_id, product_id)
+    ######################################################################
+    # UPDATE AN EXISTING ITEM
+    ######################################################################
+    @api.doc('update_shopcart_item')
+    @api.response(404, 'Item not found')
+    @api.response(400, 'The posted data was not vaild')
+    @api.expect(shopcart_model)
+    @api.marshal_with(shopcart_model)
+    def put(self, shopcart_id, product_id):
+        """
+        Updates a new Shopcart item
+        This endpoint will update a Shopcart item based on the data in the body that is posted
+        """
+        shopcartParams = {"shopcart_id": shopcart_id, "product_id": product_id}
+        api.payload.update(shopcartParams)
+        app.logger.info("Request to update item in shopcart: %s with id: %s", api.payload["shopcart_id"], api.payload["product_id"])
+        check_content_type("application/json")
 
-    if not shopcart:
-        raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
-    
-    else:
-        shopcart_dict_database = shopcart.serialize()
-        quantity = shopcart_dict_database['quantity']
-        quantity = quantity + 1
-        request_dict = request.get_json()
-        request_dict['quantity'] = str(quantity)
-        request_dict['shopcart_id'] = shopcart_id
-        shopcart.deserialize(request_dict)
-        shopcart.update()
-        return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+        shopcart = Shopcart.find(shopcart_id, product_id)
+
+        if not shopcart:
+            app.logger.info("Shopcart item with shopcart_id: %d and product_id: %d not found", shopcart_id, product_id)
+            location_url = api.url_for(ShopcartItemResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+            return "item with shopcart id '{}' and item id '{}' was not found.".format(api.payload["shopcart_id"], api.payload["product_id"]), status.HTTP_404_NOT_FOUND, {"Location": location_url}
+        
+        else:
+           
+            shopcart.deserialize(api.payload)
+            shopcart.update()
+            location_url = api.url_for(ShopcartItemResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+            return shopcart.serialize(), status.HTTP_200_OK, {"Location": location_url}
 
 
 ######################################################################
