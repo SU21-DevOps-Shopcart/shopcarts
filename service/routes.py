@@ -336,7 +336,7 @@ class ShopcartCheckoutItems(Resource):
     """
     ShopcartCheckoutItems class
     Allows the operations on a customer's shopcart
-    PUT /shopcarts/{shopcart_id}/items/{product_id}/checkout - Checkout all items from a customer's shopcart
+    PUT /shopcarts/{shopcart_id}/items/{product_id}/checkout - Checkout an existing items from a customer's shopcart
     """
 
     #------------------------------------------------------------------
@@ -344,7 +344,7 @@ class ShopcartCheckoutItems(Resource):
     #------------------------------------------------------------------
     @api.doc('checkout_shopcart_items')
     @api.response(404, 'Item not found')
-    def put(shopcart_id, product_id):
+    def put(self, shopcart_id, product_id):
         """
         Checkout an item
 
