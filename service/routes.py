@@ -8,6 +8,8 @@ GET /shopcarts/{id} - Returns the Shopcart with a given shopcart_id and product_
 POST /shopcarts/{id}/items/{id} - creates a new Shopcart record in the database
 PUT /shopcarts/{id}/items/{id} - updates a Shopcart record in the database
 DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
+PUT /shopcarts/{id}/checkout - updates all shopcart record in the database
+PUT /shopcarts/{shopcart_id}/items/{product_id}/checkout - updates a shopcart record in the database
 """
 
 from datetime import datetime
@@ -195,8 +197,25 @@ class ShopcartResource(Resource):
     #------------------------------------------------------------------
     # CLEAR SHOPCART
     #------------------------------------------------------------------
+    @api.doc('clear_shopcart')
+    @api.response(204, 'Shopcart deleted')
+    @api.marshal_with(shopcart_model)
+    def delete(self, shopcart_id):
+        """
+        Delete All items in specific cart
+        This endpoint will delete a Item based the id specified in the path
+        """
+        app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
 
+        shopcart = Shopcart.find_by_shopcart_id(int(shopcart_id))
 
+        results = [item.serialize() for item in shopcart]
+
+        if results:
+            for i in results:
+                shopcart = Shopcart.find(int(shopcart_id), i['product_id'])
+                shopcart.delete()
+        return '', status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  PATH: /shopcarts/{shopcart_id}/items/{product_id}
@@ -210,6 +229,7 @@ class ShopcartItems(Resource):
     Allows the operations on a customer's shopcart
     GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves items from a customer's shopcart
     DELETE /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
+    PUT /shopcarts/{shopcart_id}/items/{product_id} - Updates one item from a customer's shopcart
     """
 
     #------------------------------------------------------------------
@@ -266,9 +286,9 @@ def update_item(shopcart_id,product_id):
         return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 
-######################################################################
+#####################################################################
 # CHECKOUT AN EXISTING ITEM
-######################################################################
+#####################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>/checkout", methods=["PUT"])
 def checkout_item(shopcart_id,product_id):
     """
@@ -279,11 +299,11 @@ def checkout_item(shopcart_id,product_id):
     app.logger.info("Request to checkout item in shopcart: %s with id: %s",shopcart_id, product_id)
 
     shopcart = Shopcart.find(shopcart_id, product_id)
-    
+
 
     if not shopcart:
         raise NotFound("item with shopcart id '{}' and item id '{}' was not found.".format(shopcart_id,product_id))
-    
+
     else:
         shopcart_dict_database = shopcart.serialize()
         app.logger.info("changing checkout status from 0 to 1")
@@ -292,9 +312,9 @@ def checkout_item(shopcart_id,product_id):
         shopcart.update()
         return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
-######################################################################
+#####################################################################
 # CHECKOUT ALL ITEM IN SHOPCART
-######################################################################
+#####################################################################
 @app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["PUT"])
 def checkout_shopcarts(shopcart_id):
     """
@@ -307,7 +327,7 @@ def checkout_shopcarts(shopcart_id):
 
     if not shopcarts:
         raise NotFound("item with shopcart id '{}' was not found.".format(shopcart_id))
-    
+
     else:
         results = [shopcart.serialize() for shopcart in shopcarts]
         print(results)
@@ -327,24 +347,24 @@ def checkout_shopcarts(shopcart_id):
 # CLEAR SHOPCART
 ######################################################################
 
-@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
-def clear_shopcart(shopcart_id):
-    """
-    Delete All items in specific cart
-
-    This endpoint will delete a Item based the id specified in the path
-    """
-    app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
-
-    shopcart = Shopcart.find_by_shopcart_id(shopcart_id)
-
-    results = [item.serialize() for item in shopcart]
-
-    if results:
-        for i in results:
-            shopcart = Shopcart.find(shopcart_id, i['product_id'])
-            shopcart.delete()
-    return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
+# @app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+# def clear_shopcart(shopcart_id):
+#     """
+#     Delete All items in specific cart
+#
+#     This endpoint will delete a Item based the id specified in the path
+#     """
+#     app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
+#
+#     shopcart = Shopcart.find_by_shopcart_id(shopcart_id)
+#
+#     results = [item.serialize() for item in shopcart]
+#
+#     if results:
+#         for i in results:
+#             shopcart = Shopcart.find(shopcart_id, i['product_id'])
+#             shopcart.delete()
+#     return make_response(jsonify(""), status.HTTP_204_NO_CONTENT)
 
 
 
