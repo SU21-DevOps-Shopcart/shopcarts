@@ -243,7 +243,7 @@ class TestYourResourceServer(TestCase):
         """ Test update an existings items """
         #create a item
         shopcart = self._create_shopcart_with_item(1234, 100)
-        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        resp = self.app.get("/api/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         #update item
@@ -298,13 +298,13 @@ class TestYourResourceServer(TestCase):
         """ Test delete a item """
         #add a item
         shopcart = self._create_shopcart_with_item(1234, 100)
-        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        resp = self.app.get("api/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         #delete the item
         resp = self.app.delete("/api/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         # make sure item not in database
-        resp = self.app.get("/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
+        resp = self.app.get("/api/shopcarts/{}/items/{}".format(shopcart.shopcart_id,shopcart.product_id))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 

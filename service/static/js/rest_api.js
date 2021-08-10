@@ -113,12 +113,13 @@ $(function () {
     var shopcart_id = $("#shopcart_customer_id").val();
     var product_id = $("#shopcart_product_id").val();
     var queryString = "";
+
     if (shopcart_id) {
-      queryString += "/api/shopcarts?shopcart_id=" + shopcart_id;
+      queryString = "api/shopcarts?shopcart_id=" + shopcart_id;
     }
 
     if (product_id) {
-      queryString = "/api/shopcarts/" + shopcart_id + "/items/" + product_id;
+      queryString = "api/shopcarts/" + shopcart_id + "/items/" + product_id;
     }
 
     var ajax = $.ajax({

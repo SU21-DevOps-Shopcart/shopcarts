@@ -94,68 +94,68 @@ Scenario: Delete a product in shopcart
     And I set the "Product_ID" to "1"
     When I press the "Delete" button
     Then I should see the message "Item has been Deleted!"
-    # When I set the "Customer_ID" to "1234"
-    # And I set the "Product_ID" to "1" 
-    # And I press the "Retrieve" button
-    # Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
+    When I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1" 
+    And I press the "Retrieve" button
+    Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
     
-Scenario: Update one item in a Shopcart
-    When I visit the "Home Page"
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "1234" in the results
-    And I should see "1" in the results
-    And I should see "1" in the results
-    And I should see "0.99" in the results
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
-    And I change "Quantity" to "2"
-    And I press the "Update" button
-    Then I should see the message "Success"
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
-    Then I should see "2" in the "Quantity" field
+# Scenario: Update one item in a Shopcart
+#     When I visit the "Home Page"
+#     And I set the "Customer_ID" to "1234"
+#     And I set the "Product_ID" to "1"
+#     And I press the "Search" button
+#     Then I should see the message "Success"
+#     And I should see "1234" in the results
+#     And I should see "1" in the results
+#     And I should see "1" in the results
+#     And I should see "0.99" in the results
+#     When I press the "Clear" button
+#     And I set the "Customer_ID" to "1234"
+#     And I set the "Product_ID" to "1"
+#     And I press the "Retrieve" button
+#     And I change "Quantity" to "2"
+#     And I press the "Update" button
+#     Then I should see the message "Success"
+#     When I press the "Clear" button
+#     And I set the "Customer_ID" to "1234"
+#     And I set the "Product_ID" to "1"
+#     And I press the "Retrieve" button
+#     Then I should see "2" in the "Quantity" field
 
-Scenario: Checkout an item in one shopcart
-    When I visit the "Home Page"
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
-    Then I should see "0" in the "Checkout" field
-    When I press the "Checkout" button
-    Then I should see the message "Item have been checkout!"
-    When I press the "Clear" button
-    And I set the "Customer_ID" to "1234"
-    And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
-    Then I should see "1" in the "Checkout" field
-
-
-Scenario: Query shopcarts for a product_id
-    When I visit the "Home Page"
-    And I set the "Product_ID" to "4"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "5678" in the results
-    And I should see "4" in the results
-    And I should see "1" in the results
-    And I should see "50" in the results
+# Scenario: Checkout an item in one shopcart
+#     When I visit the "Home Page"
+#     And I set the "Customer_ID" to "1234"
+#     And I set the "Product_ID" to "1"
+#     And I press the "Retrieve" button
+#     Then I should see "0" in the "Checkout" field
+#     When I press the "Checkout" button
+#     Then I should see the message "Item have been checkout!"
+#     When I press the "Clear" button
+#     And I set the "Customer_ID" to "1234"
+#     And I set the "Product_ID" to "1"
+#     And I press the "Retrieve" button
+#     Then I should see "1" in the "Checkout" field
 
 
-Scenario: Read shopcarts for a product_id and customer_id
-    When I visit the "Home Page"
-    And I set the "Product_ID" to "1"
-    And I set the "Customer_ID" to "1234"
-    And I press the "Retrieve" button
-    Then I should see the message "Success"
-    Then I should see "1" in the "Quantity" field
-    And I should see "0.99" in the "Price" field
+# Scenario: Query shopcarts for a product_id
+#     When I visit the "Home Page"
+#     And I set the "Product_ID" to "4"
+#     And I press the "Search" button
+#     Then I should see the message "Success"
+#     And I should see "5678" in the results
+#     And I should see "4" in the results
+#     And I should see "1" in the results
+#     And I should see "50" in the results
+
+
+# Scenario: Read shopcarts for a product_id and customer_id
+#     When I visit the "Home Page"
+#     And I set the "Product_ID" to "1"
+#     And I set the "Customer_ID" to "1234"
+#     And I press the "Retrieve" button
+#     Then I should see the message "Success"
+#     Then I should see "1" in the "Quantity" field
+#     And I should see "0.99" in the "Price" field
     # When I press the "Clear" button
     # And I set the "Customer_ID" to "1234"
     # And I set the "Product_ID" to "4"
