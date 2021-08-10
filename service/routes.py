@@ -195,7 +195,24 @@ class ShopcartResource(Resource):
     #------------------------------------------------------------------
     # CLEAR SHOPCART
     #------------------------------------------------------------------
+    @api.doc('clear_shopcart')
+    @ api.response(204, 'Shopcart deleted')
+    def delete(self, shopcart_id):
+        """
+        Delete All items in specific cart
+        This endpoint will delete a Item based the id specified in the path
+        """
+        app.logger.info("Request to delete items in shopcart: %s ", shopcart_id)
 
+        shopcart = Shopcart.find_by_shopcart_id(shopcart_id)
+
+        results = [item.serialize() for item in shopcart]
+
+        if results:
+            for i in results:
+                shopcart = Shopcart.find(shopcart_id, i['product_id'])
+                shopcart.delete()
+        return '', status.HTTP_204_NOCONTENT
 
 
 ######################################################################
