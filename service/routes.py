@@ -384,26 +384,6 @@ class ShopcartCheckoutItems(Resource):
             shopcart.update()
             return shopcart.serialize(), status.HTTP_200_OK
 
-
-# ######################################################################
-# # RETRIEVE A SHOPCART ITEM
-# ######################################################################
-# @app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["GET"])
-# def get_item(shopcart_id, product_id):
-#     """
-#     Retrieve a single Shopcart item
-#     This endpoint will return a Shopcart item based on it's shopcart_id and product_id
-#     """
-#     app.logger.info("Request for Shopcart item with shopcart_id: %d and product_id: %d", shopcart_id, product_id)
-#     shopcart = Shopcart.find(shopcart_id, product_id)
-#     if not shopcart:
-#         raise NotFound("Shopcart with shopcart_id '{}' and product_id '{}' was not found.".format(shopcart_id, product_id))
-
-#     app.logger.info("Returning Shopcart item with shopcart_id: %d and product_id: %d", shopcart.shopcart_id, shopcart.product_id)
-#     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
-
-
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################

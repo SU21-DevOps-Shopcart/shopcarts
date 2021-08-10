@@ -113,14 +113,6 @@ $(function () {
     var shopcart_id = $("#shopcart_customer_id").val();
     var product_id = $("#shopcart_product_id").val();
 
-    // if (shopcart_id) {
-    //   queryString = "api/shopcarts?shopcart_id=" + shopcart_id;
-    // }
-
-    // if (product_id) {
-    //   queryString = "api/shopcarts/" + shopcart_id + "/items/" + product_id;
-    // }
-
     var ajax = $.ajax({
       type: "GET",
       url: "api/shopcarts/"+shopcart_id+"/items/"+product_id,
@@ -141,50 +133,6 @@ $(function () {
         $("#flash_message").attr("class", "text-danger");
       });
     });
-    // } else {
-    //   ajax.done(function (res) {
-    //     //alert(res.toSource())
-    //     $("#search_results").empty();
-    //     var header = `
-    //       <table class="table-dark w-100" cellpadding="3">
-    //         <thead>
-    //           <tr>
-    //             <th class="col-12 col-md-2 text-center">Customer ID</th>
-    //             <th class="col-12 col-md-3 text-center">Product ID</th>
-    //             <th class="col-12 col-md-4 text-center">Quantity</th>
-    //             <th class="col-12 col-md-3 text-center">Price</th>
-    //             <th class="col-12 col-md-3 text-center">Checkout</th>
-    //           </tr>
-    //         </thead>
-    //     `;
-
-    //     var firstItem = "";
-    //     var rows = res.map((item) => {
-    //       // copy the first result to the form
-    //       if (!firstItem) update_form_data(item);
-    //       // build table
-    //       return `<tr><td class="text-center">
-    //         ${item.shopcart_id}
-    //         </td><td class="text-center">
-    //         ${item.product_id}
-    //         </td><td class="text-center">
-    //         ${item.quantity}
-    //         </td><td class="text-center">
-    //         ${item.price}
-    //         </td><td class="text-center">
-    //         ${item.checkout}
-    //         </td></tr>`;
-    //     });
-
-    //     var table = header.concat(...rows, "</table>");
-
-    //     $("#search_results").append(table);
-
-    //     flash_message("Success");
-    //     $("#flash_message").attr("class", "text-success");
-    //   });
-    // }
-
   // ****************************************
   // Retrieve a Shopcart
   // ****************************************
