@@ -8,6 +8,8 @@ GET /shopcarts/{id} - Returns the Shopcart with a given shopcart_id and product_
 POST /shopcarts/{id}/items/{id} - creates a new Shopcart record in the database
 PUT /shopcarts/{id}/items/{id} - updates a Shopcart record in the database
 DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
+PUT /shopcarts/{id}/checkout - updates all shopcart record in the database
+PUT /shopcarts/{shopcart_id}/items/{product_id}/checkout - updates a shopcart record in the database
 """
 
 from datetime import datetime
