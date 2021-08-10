@@ -261,7 +261,7 @@ class ShopcartItems(Resource):
             api.payload.update(shopcartParams)
             shopcart.deserialize(api.payload)
             shopcart.update()
-            location_url = api.url_for(ShopcartItemResource, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
+            location_url = api.url_for(ShopcartItems, shopcart_id=shopcart.shopcart_id, product_id=shopcart.product_id, _external=True)
             return shopcart.serialize(), status.HTTP_200_OK, {"Location": location_url}
 
 
