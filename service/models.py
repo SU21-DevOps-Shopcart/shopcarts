@@ -119,7 +119,7 @@ class Shopcart(db.Model):
             "product_id": self.product_id, 
             "quantity": self.quantity, 
             "price": self.price,
-            "time_added": self.time_added,
+            "time_added": self.time_added.isoformat(),
             "checkout": self.checkout
             }
 

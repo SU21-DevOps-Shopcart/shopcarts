@@ -435,7 +435,7 @@ class TestYourResourceServer(TestCase):
     def test_checkout_all_items(self):
         """ Test checkout all items"""
         #test with no shopcart 
-        resp = self.app.put("shopcarts/{}/checkout".format(1234))
+        resp = self.app.put("/api/shopcarts/{}/checkout".format(1234))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
         #test with checkout all items in shopcart
@@ -443,7 +443,7 @@ class TestYourResourceServer(TestCase):
         item2 = self._create_shopcart_with_item(1234, 101)
         item3 = self._create_shopcart_with_item(1234, 102)
 
-        resp = self.app.put("shopcarts/{}/checkout".format(1234))
+        resp = self.app.put("/api/shopcarts/{}/checkout".format(1234))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         result = resp.get_json()
 
