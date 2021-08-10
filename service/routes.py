@@ -196,7 +196,7 @@ class ShopcartResource(Resource):
     # CLEAR SHOPCART
     #------------------------------------------------------------------
     @api.doc('clear_shopcart')
-    @ api.response(204, 'Shopcart deleted')
+    @api.response(204, 'Shopcart deleted')
     def delete(self, shopcart_id):
         """
         Delete All items in specific cart
