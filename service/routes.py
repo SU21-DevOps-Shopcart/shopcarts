@@ -5,6 +5,7 @@ Paths:
 ------
 GET /shopcarts - Returns a list all of all Shopcarts
 GET /shopcarts/{id} - Returns the Shopcart with a given shopcart_id and product_id
+GET /shopcarts/{id}/ - Return 
 POST /shopcarts/{id}/items/{id} - creates a new Shopcart record in the database
 PUT /shopcarts/{id}/items/{id} - updates a Shopcart record in the database
 DELETE /shopcarts/{id}/items/{id} - deletes a Shopcart record in the database
@@ -227,8 +228,8 @@ class ShopcartItems(Resource):
     """
     ShopcartItems class
     Allows the operations on a customer's shopcart
-    GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves items from a customer's shopcart
     DELETE /shopcarts/{shopcart_id}/items/{product_id} - Removes one item from a customer's shopcart
+    GET /shopcarts/{shopcart_id}/items/{product_id} - Retrieves one item from a customer's shopcart
     PUT /shopcarts/{shopcart_id}/items/{product_id} - Updates one item from a customer's shopcart
     """
 
@@ -251,6 +252,24 @@ class ShopcartItems(Resource):
             shopcart.delete()
             app.logger.info('Shopcart with id [%s] and product id [%s] was deleted', shopcart_id, product_id)
         return '', status.HTTP_204_NO_CONTENT
+    #------------------------------------------------------------------
+    # RETRIEVE ITEM
+    #------------------------------------------------------------------
+    @api.doc('get_shopcart_item')
+    @api.response(404, 'Item not found')
+    @api.marshal_with(shopcart_model)
+    def get(self ,shopcart_id, product_id):
+        """
+        Retrieve a item in specific shopcart
+
+        This endpoint will return a item based on shopcart_id and product id
+        """
+        app.logger.info("Request to Retrieve a item with id %s in shopcart %s",product_id, shopcart_id)
+        shopcart = Shopcart.find(shopcart_id, product_id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "item with id '{}' in shopcart '{}'was not found.".format(product_id, shopcart_id))
+        return shopcart.serialize(), status.HTTP_200_OK
+
 
     #------------------------------------------------------------------
     # UPDATE AN ITEM
@@ -364,26 +383,6 @@ class ShopcartCheckoutItems(Resource):
             shopcart.deserialize(shopcart_dict_database)
             shopcart.update()
             return shopcart.serialize(), status.HTTP_200_OK
-
-
-######################################################################
-# RETRIEVE A SHOPCART ITEM
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/items/<int:product_id>", methods=["GET"])
-def get_item(shopcart_id, product_id):
-    """
-    Retrieve a single Shopcart item
-    This endpoint will return a Shopcart item based on it's shopcart_id and product_id
-    """
-    app.logger.info("Request for Shopcart item with shopcart_id: %d and product_id: %d", shopcart_id, product_id)
-    shopcart = Shopcart.find(shopcart_id, product_id)
-    if not shopcart:
-        raise NotFound("Shopcart with shopcart_id '{}' and product_id '{}' was not found.".format(shopcart_id, product_id))
-
-    app.logger.info("Returning Shopcart item with shopcart_id: %d and product_id: %d", shopcart.shopcart_id, shopcart.product_id)
-    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
-
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

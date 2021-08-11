@@ -33,7 +33,7 @@ Scenario: Create a Shopcart
     And the "Price" field should be empty
     When I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "12"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "1234" in the "Customer_ID" field
     And I should see "12" in the "Product_ID" field
     And I should see "1" in the "Quantity" field
@@ -43,17 +43,17 @@ Scenario: Checkout all items in one shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "0" in the "Checkout" field
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "2"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "0" in the "Checkout" field
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "3"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "0" in the "Checkout" field
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
@@ -62,13 +62,13 @@ Scenario: Checkout all items in one shopcart
     When I press the "Clear" button 
     And I set the "Product_ID" to "1"
     And I set the "Customer_ID" to "1234"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "1" in the "Checkout" field
     When I change "Product_ID" to "2"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "1" in the "Checkout" field
     When I change "Product_ID" to "3"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "1" in the "Checkout" field
 
 Scenario: List all Items in one shopcart
@@ -94,10 +94,10 @@ Scenario: Delete a product in shopcart
     And I set the "Product_ID" to "1"
     When I press the "Delete" button
     Then I should see the message "Item has been Deleted!"
-    # When I set the "Customer_ID" to "1234"
-    # And I set the "Product_ID" to "1" 
-    # And I press the "Retrieve" button
-    # Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '1' was not found."
+    When I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "1" 
+    And I press the "Retrieve-Item" button
+    Then I should see the message "item with id '1' in shopcart '1234'was not found."
     
 Scenario: Update one item in a Shopcart
     When I visit the "Home Page"
@@ -112,28 +112,28 @@ Scenario: Update one item in a Shopcart
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     And I change "Quantity" to "2"
     And I press the "Update" button
     Then I should see the message "Success"
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "2" in the "Quantity" field
 
 Scenario: Checkout an item in one shopcart
     When I visit the "Home Page"
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "0" in the "Checkout" field
     When I press the "Checkout" button
     Then I should see the message "Item have been checkout!"
     When I press the "Clear" button
     And I set the "Customer_ID" to "1234"
     And I set the "Product_ID" to "1"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see "1" in the "Checkout" field
 
 
@@ -152,33 +152,33 @@ Scenario: Read shopcarts for a product_id and customer_id
     When I visit the "Home Page"
     And I set the "Product_ID" to "1"
     And I set the "Customer_ID" to "1234"
-    And I press the "Retrieve" button
+    And I press the "Retrieve-Item" button
     Then I should see the message "Success"
     Then I should see "1" in the "Quantity" field
     And I should see "0.99" in the "Price" field
-    # When I press the "Clear" button
-    # And I set the "Customer_ID" to "1234"
-    # And I set the "Product_ID" to "4"
-    # And I press the "Retrieve" button
-    # Then I should see the message "404 Not Found: Shopcart with shopcart_id '1234' and product_id '4' was not found."
-    # When I set the "Customer_ID" to "6789"
-    # And I set the "Product_ID" to "1"
-    # And I press the "Retrieve" button
-    # Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '1' was not found."
-    # When I set the "Customer_ID" to "6789"
-    # And I set the "Product_ID" to "4"
-    # And I press the "Retrieve" button
-    # Then I should see the message "404 Not Found: Shopcart with shopcart_id '6789' and product_id '4' was not found."
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I set the "Product_ID" to "4"
+    And I press the "Retrieve-Item" button
+    Then I should see the message "item with id '4' in shopcart '1234'was not found."
+    When I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "1"
+    And I press the "Retrieve-Item" button
+    Then I should see the message "item with id '1' in shopcart '6789'was not found."
+    When I set the "Customer_ID" to "6789"
+    And I set the "Product_ID" to "4"
+    And I press the "Retrieve-Item" button
+    Then I should see the message "item with id '4' in shopcart '6789'was not found."
 
-# Scenario: Delete all items in one shopcart
-#     When I visit the "Home Page"
-#     And I set the "Customer_ID" to "1234"
-#     And I press the "Retrieve" button
-#     Then I should see "1234" in the results
-#     When I press the "Clear" button
-#     And I set the "Customer_ID" to "1234"
-#     And I press the "Delete" button
-#     Then I should see the message "Item has been Deleted!"
-#     When I set the "Customer_ID" to "1234"
-#     And I press the "Retrieve" button
-#     Then I should not see "1234" in the results
+Scenario: Delete all items in one shopcart
+    When I visit the "Home Page"
+    And I set the "Customer_ID" to "1234"
+    And I press the "Retrieve-Shopcart" button
+    Then I should see "1234" in the results
+    When I press the "Clear" button
+    And I set the "Customer_ID" to "1234"
+    And I press the "Delete" button
+    Then I should see the message "Item has been Deleted!"
+    When I set the "Customer_ID" to "1234"
+    And I press the "Retrieve-Shopcart" button
+    Then I should not see "1234" in the results
